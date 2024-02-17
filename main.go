@@ -9,6 +9,7 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/database"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/server"
 )
 
 func main() {
@@ -29,4 +30,6 @@ func main() {
 
 	db := database.DbConnect(ctx, cfg)
 	defer db.Disconnect(ctx)
+
+	server.Start(ctx, cfg, db)
 }

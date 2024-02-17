@@ -9,7 +9,7 @@ services:
         - 27017:27017
       environment:
          MONGO_INITDB_ROOT_USERNAME: root
-         MONGO_INITDB_ROOT_PASSWORD: example
+         MONGO_INITDB_ROOT_PASSWORD: 123456
 
    item-db:
       image: mongo
@@ -19,7 +19,7 @@ services:
         - 27018:27017
       environment:
          MONGO_INITDB_ROOT_USERNAME: root
-         MONGO_INITDB_ROOT_PASSWORD: example
+         MONGO_INITDB_ROOT_PASSWORD: 123456
 
    player-db:
       image: mongo
@@ -29,7 +29,7 @@ services:
         - 27019:27017
       environment:
          MONGO_INITDB_ROOT_USERNAME: root
-         MONGO_INITDB_ROOT_PASSWORD: example
+         MONGO_INITDB_ROOT_PASSWORD: 123456
 
    inventory-db:
       image: mongo
@@ -39,7 +39,7 @@ services:
         - 27020:27017
       environment:
          MONGO_INITDB_ROOT_USERNAME: root
-         MONGO_INITDB_ROOT_PASSWORD: example
+         MONGO_INITDB_ROOT_PASSWORD: 123456
 
    payment-db:
       image: mongo
@@ -49,4 +49,4 @@ services:
         - 27021:27017
       environment:
          MONGO_INITDB_ROOT_USERNAME: root
-         MONGO_INITDB_ROOT_PASSWORD: example
+         MONGO_INITDB_ROOT_PASSWORD: 123456

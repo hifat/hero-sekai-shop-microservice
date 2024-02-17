@@ -17,11 +17,11 @@ func DbConnect(pctx context.Context, cfg *config.Config) *mongo.Client {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Db.Url))
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Fatal(err.Error())
 	}
 
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		logger.Error(err.Error())
+		logger.Fatal(err.Error())
 	}
 
 	return client

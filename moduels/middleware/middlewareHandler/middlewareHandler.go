@@ -1,16 +1,11 @@
 package middlewareHandler
 
-import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareUsecase"
-	"go.mongodb.org/mongo-driver/mongo"
-)
+type Handler struct {
+	middlewareHttp *middlewareHttp
+}
 
-type (
-	middlewareHttpHandler struct {
-		middlewareUsecase middlewareUsecase.IMiddlewareUsecase
+func NewHandler(middlewareHttp *middlewareHttp) Handler {
+	return Handler{
+		middlewareHttp,
 	}
-)
-
-func NewHttp(db *mongo.Client) *middlewareHttpHandler {
-	return &middlewareHttpHandler{db}
 }
