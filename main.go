@@ -1,18 +1,23 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
 	"strings"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/database"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 )
 
 func main() {
+	ctx := context.Background()
+
 	cfg := config.LoadAppConfig(func() (string, string) {
 		if len(os.Args) < 2 {
-			log.Fatal("Err: env path is required")
+			log.Fatal()
+			logger.Error("Err: env path is required")
 		}
 
 		splitPaths := strings.Split(os.Args[1], "/")
@@ -22,5 +27,6 @@ func main() {
 		return path, filename
 	}())
 
-	fmt.Printf("\n %+v \n", cfg)
+	db := database.DbConnect(ctx, cfg)
+	defer db.Disconnect(ctx)
 }
