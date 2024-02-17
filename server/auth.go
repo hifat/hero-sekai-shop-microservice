@@ -6,6 +6,7 @@ func (s *server) authService() {
 	authGroup := s.app.Group("auth_v1")
 
 	authHandler := auth.InitAuth(s.cfg, s.db)
-	_ = authGroup
 	_ = authHandler
+
+	authGroup.GET("", s.healthCheckService)
 }
