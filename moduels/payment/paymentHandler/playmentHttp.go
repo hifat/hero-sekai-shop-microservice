@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpPaymentHandler struct {
+	httpPaymentHttp struct {
 		cfg            *config.Config
 		paymentUsecase paymentUsecase.IPaymentUsecase
 	}
 )
 
-func NewPaymentHttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) httpPaymentHandler {
-	return httpPaymentHandler{cfg, paymentUsecase}
+func NewPaymentHttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) httpPaymentHttp {
+	return httpPaymentHttp{cfg, paymentUsecase}
 }

@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpItemHandler struct {
+	httpItemGrpc struct {
 		cfg         *config.Config
 		itemUsecase itemUsecase.IItemUsecase
 	}
 )
 
-func NewItemHttp(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) httpItemHandler {
-	return httpItemHandler{cfg, itemUsecase}
+func NewItemGrpc(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) httpItemGrpc {
+	return httpItemGrpc{cfg, itemUsecase}
 }

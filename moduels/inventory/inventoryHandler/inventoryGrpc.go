@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpInventoryHandler struct {
+	httpInventoryGrpc struct {
 		cfg              *config.Config
 		inventoryUsecase inventoryUsecase.IInventoryUsecase
 	}
 )
 
-func NewInventoryHttp(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) httpInventoryHandler {
-	return httpInventoryHandler{cfg, inventoryUsecase}
+func NewInventoryGrpc(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) httpInventoryGrpc {
+	return httpInventoryGrpc{cfg, inventoryUsecase}
 }
