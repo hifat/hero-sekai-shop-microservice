@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpHandler struct {
+	httpAuthHandler struct {
 		cfg         *config.Config
 		authUsecase authUsecase.IAuthUsecase
 	}
 )
 
-func NewHttp(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) httpHandler {
-	return httpHandler{cfg, authUsecase}
+func NewAuthHttp(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) httpAuthHandler {
+	return httpAuthHandler{cfg, authUsecase}
 }
