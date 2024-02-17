@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewInventoryGrpc(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) httpInventoryGrpc {
-	return httpInventoryGrpc{cfg, inventoryUsecase}
+func NewInventoryGrpc(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *httpInventoryGrpc {
+	return &httpInventoryGrpc{cfg, inventoryUsecase}
 }

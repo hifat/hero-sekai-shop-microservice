@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewPaymentGrpc(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) httpPaymentGrpc {
-	return httpPaymentGrpc{cfg, paymentUsecase}
+func NewPaymentGrpc(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *httpPaymentGrpc {
+	return &httpPaymentGrpc{cfg, paymentUsecase}
 }

@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewItemGrpc(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) httpItemGrpc {
-	return httpItemGrpc{cfg, itemUsecase}
+func NewItemGrpc(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) *httpItemGrpc {
+	return &httpItemGrpc{cfg, itemUsecase}
 }

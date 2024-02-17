@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewAuthGrpc(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) authGrpcHandler {
-	return authGrpcHandler{cfg, authUsecase}
+func NewAuthGrpc(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) *authGrpcHandler {
+	return &authGrpcHandler{cfg, authUsecase}
 }

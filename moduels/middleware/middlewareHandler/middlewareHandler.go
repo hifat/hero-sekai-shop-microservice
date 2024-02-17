@@ -11,6 +11,6 @@ type (
 	}
 )
 
-func NewHttp(db *mongo.Client) middlewareHttpHandler {
-	return middlewareHttpHandler{db}
+func NewHttp(db *mongo.Client) *middlewareHttpHandler {
+	return &middlewareHttpHandler{db}
 }

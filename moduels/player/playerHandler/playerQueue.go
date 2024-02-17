@@ -8,6 +8,6 @@ type (
 	}
 )
 
-func NewPlayerQueue(playerUsecase playerUsecase.IPlayerUsecase) playerQueue {
-	return playerQueue{playerUsecase}
+func NewPlayerQueue(playerUsecase playerUsecase.IPlayerUsecase) *playerQueue {
+	return &playerQueue{playerUsecase}
 }

@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewPaymentHttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) httpPaymentHttp {
-	return httpPaymentHttp{cfg, paymentUsecase}
+func NewPaymentHttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *httpPaymentHttp {
+	return &httpPaymentHttp{cfg, paymentUsecase}
 }

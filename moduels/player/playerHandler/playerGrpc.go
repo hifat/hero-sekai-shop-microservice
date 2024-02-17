@@ -8,6 +8,6 @@ type (
 	}
 )
 
-func NewPlayerGrpc(playerUsecase playerUsecase.IPlayerUsecase) playerGrpc {
-	return playerGrpc{playerUsecase}
+func NewPlayerGrpc(playerUsecase playerUsecase.IPlayerUsecase) *playerGrpc {
+	return &playerGrpc{playerUsecase}
 }

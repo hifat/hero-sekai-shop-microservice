@@ -8,6 +8,6 @@ type (
 	}
 )
 
-func NewPlayerHttp(playerUsecase playerUsecase.IPlayerUsecase) playerHttp {
-	return playerHttp{playerUsecase}
+func NewPlayerHttp(playerUsecase playerUsecase.IPlayerUsecase) *playerHttp {
+	return &playerHttp{playerUsecase}
 }

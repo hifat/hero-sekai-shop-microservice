@@ -12,6 +12,6 @@ type (
 	}
 )
 
-func NewInventoryHttp(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) httpInventoryHttp {
-	return httpInventoryHttp{cfg, inventoryUsecase}
+func NewInventoryHttp(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *httpInventoryHttp {
+	return &httpInventoryHttp{cfg, inventoryUsecase}
 }
