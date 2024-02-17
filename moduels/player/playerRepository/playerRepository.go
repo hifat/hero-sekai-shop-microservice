@@ -1,6 +1,10 @@
 package playerRepository
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"context"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type (
 	IPlayerRepository interface{}
@@ -12,4 +16,8 @@ type (
 
 func NewPlayer(db *mongo.Client) IPlayerRepository {
 	return &playerRepository{db}
+}
+
+func (r *playerRepository) dbConn(pctx context.Context) *mongo.Database {
+	return r.db.Database("player_db")
 }

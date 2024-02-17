@@ -1,6 +1,10 @@
 package inventoryRepository
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"context"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type (
 	IInventoryRepository interface{}
@@ -12,4 +16,8 @@ type (
 
 func NewInventory(db *mongo.Client) IInventoryRepository {
 	return &inventoryRepository{db}
+}
+
+func (r *inventoryRepository) dbConn(pctx context.Context) *mongo.Database {
+	return r.db.Database("inventory_db")
 }
