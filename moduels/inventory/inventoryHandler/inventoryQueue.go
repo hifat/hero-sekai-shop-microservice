@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpInventoryQueue struct {
+	inventoryQueue struct {
 		cfg              *config.Config
 		inventoryUsecase inventoryUsecase.IInventoryUsecase
 	}
 )
 
-func NewInventoryQueue(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *httpInventoryQueue {
-	return &httpInventoryQueue{cfg, inventoryUsecase}
+func NewInventoryQueue(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *inventoryQueue {
+	return &inventoryQueue{cfg, inventoryUsecase}
 }

@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpItemHttp struct {
+	itemHttp struct {
 		cfg         *config.Config
 		itemUsecase itemUsecase.IItemUsecase
 	}
 )
 
-func NewItemHttp(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) *httpItemHttp {
-	return &httpItemHttp{cfg, itemUsecase}
+func NewItemHttp(cfg *config.Config, itemUsecase itemUsecase.IItemUsecase) *itemHttp {
+	return &itemHttp{cfg, itemUsecase}
 }

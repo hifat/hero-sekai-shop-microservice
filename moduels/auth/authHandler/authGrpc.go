@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	authGrpcHandler struct {
+	authGrpc struct {
 		cfg         *config.Config
 		authUsecase authUsecase.IAuthUsecase
 	}
 )
 
-func NewAuthGrpc(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) *authGrpcHandler {
-	return &authGrpcHandler{cfg, authUsecase}
+func NewAuthGrpc(cfg *config.Config, authUsecase authUsecase.IAuthUsecase) *authGrpc {
+	return &authGrpc{cfg, authUsecase}
 }

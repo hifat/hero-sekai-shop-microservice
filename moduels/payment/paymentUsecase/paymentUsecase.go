@@ -1,6 +1,6 @@
 package paymentUsecase
 
-import paymentRepository "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymenthRepository"
+import paymentRepository "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentRepository"
 
 type (
 	IPaymentUsecase interface{}

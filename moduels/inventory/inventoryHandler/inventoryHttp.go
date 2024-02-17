@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpInventoryHttp struct {
+	inventoryHttp struct {
 		cfg              *config.Config
 		inventoryUsecase inventoryUsecase.IInventoryUsecase
 	}
 )
 
-func NewInventoryHttp(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *httpInventoryHttp {
-	return &httpInventoryHttp{cfg, inventoryUsecase}
+func NewInventoryHttp(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *inventoryHttp {
+	return &inventoryHttp{cfg, inventoryUsecase}
 }

@@ -1,4 +1,4 @@
-package paymentHandler
+package paymentandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpPaymentHttp struct {
+	paymentttp struct {
 		cfg            *config.Config
 		paymentUsecase paymentUsecase.IPaymentUsecase
 	}
 )
 
-func NewPaymentHttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *httpPaymentHttp {
-	return &httpPaymentHttp{cfg, paymentUsecase}
+func Newpaymentttp(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *paymentttp {
+	return &paymentttp{cfg, paymentUsecase}
 }

@@ -1,4 +1,4 @@
-package paymentHandler
+package paymentandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	httpPaymentGrpc struct {
+	paymentGrpc struct {
 		cfg            *config.Config
 		paymentUsecase paymentUsecase.IPaymentUsecase
 	}
 )
 
-func NewPaymentGrpc(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *httpPaymentGrpc {
-	return &httpPaymentGrpc{cfg, paymentUsecase}
+func NewPaymentGrpc(cfg *config.Config, paymentUsecase paymentUsecase.IPaymentUsecase) *paymentGrpc {
+	return &paymentGrpc{cfg, paymentUsecase}
 }
