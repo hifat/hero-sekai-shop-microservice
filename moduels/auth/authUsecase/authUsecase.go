@@ -10,6 +10,6 @@ type (
 	}
 )
 
-func NewAuthUsecase(authRepo authRepository.IAuthRepository) IAuthUsecase {
+func NewAuth(authRepo authRepository.IAuthRepository) IAuthUsecase {
 	return &authUsecase{authRepo}
 }

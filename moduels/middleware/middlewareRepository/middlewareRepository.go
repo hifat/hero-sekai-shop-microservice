@@ -3,13 +3,13 @@ package middlewareRepository
 import "go.mongodb.org/mongo-driver/mongo"
 
 type (
-	IRepository interface{}
+	IMiddlewareRepository interface{}
 
-	repository struct {
+	middlewareRepository struct {
 		db *mongo.Client
 	}
 )
 
-func New(db *mongo.Client) IRepository {
-	return &repository{db}
+func NewMiddleware(db *mongo.Client) IMiddlewareRepository {
+	return &middlewareRepository{db}
 }

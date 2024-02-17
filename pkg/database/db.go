@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
@@ -18,11 +17,11 @@ func DbConnect(pctx context.Context, cfg *config.Config) *mongo.Client {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Db.Url))
 	if err != nil {
-		logger.Error(fmt.Sprintf("Connect to database error: %s", err.Error()))
+		logger.Error(err.Error())
 	}
 
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		logger.Error(fmt.Sprintf("Error: Pinging to databse error: %s", err.Error()))
+		logger.Error(err.Error())
 	}
 
 	return client

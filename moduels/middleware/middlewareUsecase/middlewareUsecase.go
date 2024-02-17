@@ -5,13 +5,13 @@ import (
 )
 
 type (
-	IUsecase interface{}
+	IMiddlewareUsecase interface{}
 
-	usecase struct {
-		middlewareRepo middlewareRepository.IRepository
+	middlewareUsecase struct {
+		middlewareRepo middlewareRepository.IMiddlewareRepository
 	}
 )
 
-func New(middlewareRepo middlewareRepository.IRepository) IUsecase {
-	return &usecase{middlewareRepo}
+func NewMiddleware(middlewareRepo middlewareRepository.IMiddlewareRepository) IMiddlewareUsecase {
+	return &middlewareUsecase{middlewareRepo}
 }

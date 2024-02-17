@@ -6,11 +6,11 @@ import (
 )
 
 type (
-	middlewareHandler struct {
-		middlewareUsecase middlewareUsecase.IUsecase
+	httpHandler struct {
+		middlewareUsecase middlewareUsecase.IMiddlewareUsecase
 	}
 )
 
-func NewMiddlewareHandler(db *mongo.Client) middlewareHandler {
-	return middlewareHandler{db}
+func NewHttp(db *mongo.Client) httpHandler {
+	return httpHandler{db}
 }

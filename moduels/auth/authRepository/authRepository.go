@@ -14,10 +14,10 @@ type (
 	}
 )
 
-func NewAuthRepository(db *mongo.Client) IAuthRepository {
+func NewAuth(db *mongo.Client) IAuthRepository {
 	return &authRepository{db}
 }
 
-func (r *authRepository) authDbConn(pctx context.Context) *mongo.Database {
+func (r *authRepository) dbConn(pctx context.Context) *mongo.Database {
 	return r.db.Database("auth_db")
 }
