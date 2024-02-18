@@ -21,7 +21,7 @@ func InitAuth(cfg *config.Config, db *mongo.Client) authHandler.Handler {
 	iAuthRepository := authRepository.NewAuth(db)
 	iAuthUsecase := authUsecase.NewAuth(iAuthRepository)
 	authHttp := authHandler.NewAuthHttp(cfg, iAuthUsecase)
-	authGrpc := authHandler.NewAuthGrpc(cfg, iAuthUsecase)
+	authGrpc := authHandler.NewAuthGrpc(iAuthUsecase)
 	handler := authHandler.NewHandler(authHttp, authGrpc)
 	return handler
 }

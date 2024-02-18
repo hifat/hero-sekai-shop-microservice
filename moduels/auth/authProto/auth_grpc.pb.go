@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.3
-// source: moduels/auth/authPb/auth.proto
+// source: moduels/auth/authProto/auth.proto
 
-package authPb
+package authProto
 
 import (
 	context "context"
@@ -36,7 +36,7 @@ func NewAuthGrpcServiceClient(cc grpc.ClientConnInterface) AuthGrpcServiceClient
 
 func (c *authGrpcServiceClient) CredentialSearch(ctx context.Context, in *CredentialSearchReq, opts ...grpc.CallOption) (*CredentialSearchRes, error) {
 	out := new(CredentialSearchRes)
-	err := c.cc.Invoke(ctx, "/AuthGrpcService/CredentialSearch", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authProto.AuthGrpcService/CredentialSearch", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *authGrpcServiceClient) CredentialSearch(ctx context.Context, in *Creden
 
 func (c *authGrpcServiceClient) RolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error) {
 	out := new(RolesCountRes)
-	err := c.cc.Invoke(ctx, "/AuthGrpcService/RolesCount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authProto.AuthGrpcService/RolesCount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func _AuthGrpcService_CredentialSearch_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthGrpcService/CredentialSearch",
+		FullMethod: "/authProto.AuthGrpcService/CredentialSearch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthGrpcServiceServer).CredentialSearch(ctx, req.(*CredentialSearchReq))
@@ -112,7 +112,7 @@ func _AuthGrpcService_RolesCount_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthGrpcService/RolesCount",
+		FullMethod: "/authProto.AuthGrpcService/RolesCount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthGrpcServiceServer).RolesCount(ctx, req.(*RolesCountReq))
@@ -124,7 +124,7 @@ func _AuthGrpcService_RolesCount_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthGrpcService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "AuthGrpcService",
+	ServiceName: "authProto.AuthGrpcService",
 	HandlerType: (*AuthGrpcServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -137,5 +137,5 @@ var AuthGrpcService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "moduels/auth/authPb/auth.proto",
+	Metadata: "moduels/auth/authProto/auth.proto",
 }
