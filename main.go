@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"strings"
 
@@ -17,7 +16,6 @@ func main() {
 
 	cfg := config.LoadAppConfig(func() (string, string) {
 		if len(os.Args) < 2 {
-			log.Fatal()
 			logger.Error("Err: env path is required")
 		}
 

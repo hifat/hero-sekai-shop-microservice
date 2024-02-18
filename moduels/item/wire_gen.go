@@ -20,7 +20,7 @@ import (
 func InitItem(cfg *config.Config, db *mongo.Client) itemHandler.Handler {
 	iItemRepository := itemRepository.NewItem(db)
 	iItemUsecase := itemUsecase.NewItem(iItemRepository)
-	itemGrpc := itemHandler.NewItemGrpc(cfg, iItemUsecase)
+	itemGrpc := itemHandler.NewItemGrpc(iItemUsecase)
 	itemHttp := itemHandler.NewItemHttp(cfg, iItemUsecase)
 	handler := itemHandler.NewHandler(itemGrpc, itemHttp)
 	return handler
