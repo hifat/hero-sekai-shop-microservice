@@ -1,0 +1,29 @@
+package model
+
+type (
+	PaginateReq struct {
+		Start string `query:"start" validate:"max=64"`
+		Limit string `query:"limit" validate:"required,min=2,max=10"`
+	}
+
+	FirstPaginate struct {
+		Href  string `json:"href"`
+		Start string `json:"start"`
+	}
+
+	NextPaginate struct {
+		Href string `json:"href"`
+	}
+
+	PaginateRes struct {
+		Data  any           `json:"data"`
+		Limit int           `json:"limit"`
+		Total int64         `json:"total"`
+		First FirstPaginate `json:"first"`
+		Next  NextPaginate  `json:"next"`
+	}
+
+	KafkaOffset struct {
+		Offset int64 `json:"offset" bson:"offset"`
+	}
+)
