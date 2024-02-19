@@ -1,21 +1,25 @@
 package inventoryHandler
 
 import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"context"
+
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryUsecase"
 )
 
 type (
 	inventoryGrpc struct {
-		cfg              *config.Config
+		inventoryProto.UnimplementedInventoryGrpcServiceServer
 		inventoryUsecase inventoryUsecase.IInventoryUsecase
 	}
 )
 
-func NewInventoryGrpc(cfg *config.Config, inventoryUsecase inventoryUsecase.IInventoryUsecase) *inventoryGrpc {
-	return &inventoryGrpc{cfg, inventoryUsecase}
+func NewInventoryGrpc(inventoryUsecase inventoryUsecase.IInventoryUsecase) *inventoryGrpc {
+	return &inventoryGrpc{
+		inventoryUsecase: inventoryUsecase,
+	}
 }
 
-func (h *inventoryGrpc) Foo() {
-
+func (g *inventoryGrpc) IsAvailableToSell(context.Context, *inventoryProto.IsAvailableToSellReq) (*inventoryProto.IsAvailableToSellRes, error) {
+	return nil, nil
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package inventoryProto;
+option go_package = "./inventoryProto";
+
+message IsAvailableToSellReq {
+    string playerId = 1;
+}
+
+message IsAvailableToSellRes {
+    bool IsAvailable = 1;
+}
+
+service InventoryGrpcService {
+    rpc IsAvailableToSell(IsAvailableToSellReq) returns (IsAvailableToSellRes);
+}
