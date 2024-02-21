@@ -3,11 +3,11 @@ syntax = "proto3";
 package authProto;
 option go_package = "./authProto";
 
-message CredentialSearchReq {
+message AccessTokenSearchReq {
     string accessToken = 1;
 }
 
-message CredentialSearchRes {
+message AccessTokenSearchRes {
     bool isValid = 1;
 }
 
@@ -16,6 +16,6 @@ message RolesCountReq {}
 message RolesCountRes {}
 
 service AuthGrpcService {
-    rpc CredentialSearch(CredentialSearchReq) returns (CredentialSearchRes);
+    rpc AccessTokenSearch(AccessTokenSearchReq) returns (AccessTokenSearchRes);
     rpc RolesCount(RolesCountReq) returns (RolesCountRes);
 }

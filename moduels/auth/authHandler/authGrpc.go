@@ -20,7 +20,7 @@ func NewAuthGrpc(authUsecase authUsecase.IAuthUsecase) *authGrpc {
 	}
 }
 
-func (g *authGrpc) CredentialSearch(context.Context, *authProto.CredentialSearchReq) (*authProto.CredentialSearchRes, error) {
+func (g *authGrpc) AccessTokenSearch(context.Context, *authProto.AccessTokenSearchReq) (*authProto.AccessTokenSearchRes, error) {
 	return nil, nil
 }
 
