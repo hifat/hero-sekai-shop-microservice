@@ -16,6 +16,7 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareHandler"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/exp/slog"
 )
 
 type server struct {
@@ -26,9 +27,9 @@ type server struct {
 }
 
 func (s *server) gracefulShutdown(pctx context.Context, quit <-chan os.Signal) {
-	logger.Info(fmt.Sprintf("start service: %s", s.cfg.App.Name))
+	slog.Info(fmt.Sprintf("start service: %s", s.cfg.App.Name))
 	<-quit
-	logger.Info(fmt.Sprintf("shuting down service: %s", s.cfg.App.Name))
+	slog.Info(fmt.Sprintf("shuting down service: %s", s.cfg.App.Name))
 
 	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
 	defer cancel()
