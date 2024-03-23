@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package player
+package playerDI
 
 import (
 	"github.com/google/wire"

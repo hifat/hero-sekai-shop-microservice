@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 )
 
 func (s *server) playerService() {
-	playerHandler := player.InitPlayer(s.cfg, s.db)
+	playerHandler := playerDI.InitPlayer(s.cfg, s.db)
 
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.PlayerUrl)

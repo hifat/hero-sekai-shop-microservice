@@ -1,8 +1,6 @@
 package authRepository
 
 import (
-	"context"
-
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,6 +16,6 @@ func NewAuth(db *mongo.Client) IAuthRepository {
 	return &authRepository{db}
 }
 
-func (r *authRepository) dbConn(pctx context.Context) *mongo.Database {
+func (r *authRepository) dbConn() *mongo.Database {
 	return r.db.Database("auth_db")
 }
