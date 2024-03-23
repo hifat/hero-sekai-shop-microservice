@@ -1,8 +1,6 @@
 package playerUsecase
 
-import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerRepository"
-)
+import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerRepository"
 
 type (
 	IPlayerUsecase interface{}

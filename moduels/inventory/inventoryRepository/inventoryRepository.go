@@ -1,8 +1,6 @@
 package inventoryRepository
 
 import (
-	"context"
-
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,6 +16,6 @@ func NewInventory(db *mongo.Client) IInventoryRepository {
 	return &inventoryRepository{db}
 }
 
-func (r *inventoryRepository) dbConn(pctx context.Context) *mongo.Database {
+func (r *inventoryRepository) dbConn() *mongo.Database {
 	return r.db.Database("inventory_db")
 }

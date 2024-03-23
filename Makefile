@@ -8,3 +8,6 @@ pb-gen:
 
 seed:
 	go run ./pkg/database/script/migration.go ./env/$e/.env.$a
+
+db-up:
+	docker compose -f docker-compose.db.yaml up
