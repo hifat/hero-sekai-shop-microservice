@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareHandler"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -50,7 +50,7 @@ func Start(pctx context.Context, cfg *config.Config, db *mongo.Client) {
 		app:        echo.New(),
 		db:         db,
 		cfg:        cfg,
-		middleware: middleware.InitMiddleware(cfg, db),
+		middleware: middlewareDI.InitMiddleware(cfg, db),
 	}
 
 	s.app.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{

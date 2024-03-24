@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package auth
+package authDI
 
 import (
 	"github.com/google/wire"

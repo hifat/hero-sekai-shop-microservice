@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package middleware
+package middlewareDI
 
 import (
 	"github.com/google/wire"

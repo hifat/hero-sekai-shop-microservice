@@ -6,24 +6,24 @@ import (
 )
 
 type (
-	contextWrapperService interface {
+	httpContextService interface {
 		Bind(data any) error
 	}
 
-	contextWrapper struct {
+	httpContext struct {
 		Context   echo.Context
 		validator *validator.Validate
 	}
 )
 
-func ContextWrapper(ctx echo.Context) contextWrapperService {
-	return &contextWrapper{
+func NewHttpContext(ctx echo.Context) httpContextService {
+	return &httpContext{
 		Context:   ctx,
 		validator: validator.New(),
 	}
 }
 
-func (c *contextWrapper) Bind(data any) error {
+func (c *httpContext) Bind(data any) error {
 	if err := c.Context.Bind(data); err != nil {
 		return err
 	}

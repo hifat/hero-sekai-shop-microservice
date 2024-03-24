@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 )
 
 func (s *server) itemService() {
-	itemHandler := item.InitItem(s.cfg, s.db)
+	itemHandler := itemDI.InitItem(s.cfg, s.db)
 
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.ItemUrl)

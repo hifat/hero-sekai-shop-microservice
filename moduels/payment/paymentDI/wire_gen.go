@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package payment
+package paymentDI
 
 import (
 	"github.com/google/wire"

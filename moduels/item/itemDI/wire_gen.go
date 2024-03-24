@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package item
+package itemDI
 
 import (
 	"github.com/google/wire"

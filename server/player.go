@@ -23,7 +23,7 @@ func (s *server) playerService() {
 
 	playerGroup := s.app.Group("player_v1")
 
-	_ = playerHandler
+	playerGroup.GET("/healtz", s.healthCheckService)
 
-	playerGroup.GET("", s.healthCheckService)
+	playerGroup.POST("/register", playerHandler.PlayerHttp.Create)
 }
