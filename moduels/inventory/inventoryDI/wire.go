@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package inventory
+package inventoryDI
 
 import (
 	"github.com/google/wire"

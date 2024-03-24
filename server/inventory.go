@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 )
 
 func (s *server) inventoryService() {
-	inventoryHandler := inventory.InitInventory(s.cfg, s.db)
+	inventoryHandler := inventoryDI.InitInventory(s.cfg, s.db)
 
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.InventoryUrl)

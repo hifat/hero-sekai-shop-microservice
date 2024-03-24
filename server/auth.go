@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 )
 
 func (s *server) authService() {
-	authHandler := auth.InitAuth(s.cfg, s.db)
+	authHandler := authDI.InitAuth(s.cfg, s.db)
 
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.AuthUrl)
