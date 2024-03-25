@@ -21,9 +21,12 @@ func (s *server) playerService() {
 		grpcServer.Serve(lis)
 	}()
 
-	playerGroup := s.app.Group("player_v1")
+	playerV1Group := s.app.Group("player_v1")
 
-	playerGroup.GET("/healtz", s.healthCheckService)
+	playerV1Group.GET("/healtz", s.healthCheckService)
+
+	playerGroup := playerV1Group.Group("/players")
 
 	playerGroup.POST("/register", playerHandler.PlayerHttp.Create)
+	playerGroup.GET("/:player_id", playerHandler.PlayerHttp.GetProfile)
 }
