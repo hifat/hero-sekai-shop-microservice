@@ -3,6 +3,7 @@ package playerRepository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/appError"
@@ -10,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type (
@@ -36,19 +38,28 @@ func (r *playerRepository) FirstByField(pctx context.Context, field string, expe
 	db := r.dbConn()
 	col := db.Collection("players")
 
-	player := player.Player{}
+	if field == "_id" {
+		expected = utils.ConvertToObjectId(fmt.Sprintf("%v", expected))
+	}
+
+	var result player.Player
 	if err := col.FindOne(
 		pctx,
-		bson.M{
-			field: expected,
-		},
-	).Decode(player); err != nil {
+		bson.M{field: expected},
+		options.FindOne().SetProjection(bson.M{
+			"_id":        1,
+			"email":      1,
+			"username":   1,
+			"created_at": 1,
+			"updated_at": 1,
+		}),
+	).Decode(&result); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, appError.ErrRecordNotFound
 		}
 	}
 
-	return &player, nil
+	return &result, nil
 }
 
 func (r *playerRepository) ExistsByField(pctx context.Context, field string, expected any) (bool, error) {
@@ -65,7 +76,7 @@ func (r *playerRepository) ExistsByField(pctx context.Context, field string, exp
 }
 
 func (r *playerRepository) Create(pctx context.Context, req player.Player) (string, error) {
-	col := r.dbConn().Collection("player")
+	col := r.dbConn().Collection("players")
 
 	req.CreatedAt = utils.TimeNow()
 	req.UpdatedAt = utils.TimeNow()

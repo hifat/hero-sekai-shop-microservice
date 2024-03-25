@@ -13,7 +13,8 @@ import (
 
 type (
 	IPlayerUsecase interface {
-		Create(pctx context.Context, req player.CreatePlayerReq) (string, error)
+		Create(pctx context.Context, req player.CreatePlayerReq) (*player.PlayerProfile, error)
+		GetProfile(pctx context.Context, playerId string) (*player.PlayerProfile, error)
 	}
 
 	playerUsecase struct {
@@ -25,29 +26,29 @@ func NewPlayer(playerRepo playerRepository.IPlayerRepository) IPlayerUsecase {
 	return &playerUsecase{playerRepo}
 }
 
-func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq) (string, error) {
+func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq) (*player.PlayerProfile, error) {
 	isUsernameExists, err := u.playerRepo.ExistsByField(pctx, "username", req.Username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if isUsernameExists {
-		return "", playerError.ErrDuplicateUsername
+		return nil, playerError.ErrDuplicateUsername
 	}
 
 	isEmailExists, err := u.playerRepo.ExistsByField(pctx, "email", req.Email)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if isEmailExists {
-		return "", playerError.ErrDuplicateEmail
+		return nil, playerError.ErrDuplicateEmail
 	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {
 		logger.Error(err)
-		return "", err
+		return nil, err
 	}
 
 	req.Password = string(hashPassword)
@@ -55,7 +56,7 @@ func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq)
 	var newPlayer player.Player
 	if err := copier.Copy(&newPlayer, &req); err != nil {
 		logger.Error(err)
-		return "", err
+		return nil, err
 	}
 
 	newPlayer.PlayerRoles = []player.PlayerRole{
@@ -67,8 +68,26 @@ func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq)
 
 	playerId, err := u.playerRepo.Create(pctx, newPlayer)
 	if err != nil {
-		return "", nil
+		return nil, nil
 	}
 
-	return playerId, nil
+	return u.GetProfile(pctx, playerId)
+}
+
+func (u *playerUsecase) GetProfile(pctx context.Context, playerId string) (*player.PlayerProfile, error) {
+	getPlayer, err := u.playerRepo.FirstByField(pctx, "_id", playerId)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	var res player.PlayerProfile
+	if err := copier.Copy(&res, &getPlayer); err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	res.Id = getPlayer.Id.Hex()
+
+	return &res, nil
 }

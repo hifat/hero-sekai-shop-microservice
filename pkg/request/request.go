@@ -8,6 +8,7 @@ import (
 type (
 	httpContextService interface {
 		Bind(data any) error
+		Param(name string) string
 	}
 
 	httpContext struct {
@@ -33,4 +34,8 @@ func (c *httpContext) Bind(data any) error {
 	}
 
 	return nil
+}
+
+func (c *httpContext) Param(name string) string {
+	return c.Context.Param(name)
 }
