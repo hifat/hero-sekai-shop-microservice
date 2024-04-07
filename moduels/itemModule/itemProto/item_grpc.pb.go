@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.3
-// source: moduels/item/itemProto/item.proto
+// source: moduels/itemModule/itemProto/item.proto
 
 package itemProto
 
@@ -101,5 +101,5 @@ var ItemGrpcService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "moduels/item/itemProto/item.proto",
+	Metadata: "moduels/itemModule/itemProto/item.proto",
 }

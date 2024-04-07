@@ -1,7 +1,7 @@
 package itemUsecase
 
 import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemRepository"
 )
 
 type (

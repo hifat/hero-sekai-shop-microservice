@@ -1,4 +1,4 @@
-package item
+package itemModule
 
 import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 

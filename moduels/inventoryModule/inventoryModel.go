@@ -1,7 +1,7 @@
 package inventoryModule
 
 import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 )
 
@@ -13,7 +13,7 @@ type (
 
 	ItemInInventory struct {
 		InventoryId string `json:"inventory_id"`
-		*item.ItemShowCase
+		*itemModule.ItemShowCase
 	}
 
 	PlayerInventory struct {

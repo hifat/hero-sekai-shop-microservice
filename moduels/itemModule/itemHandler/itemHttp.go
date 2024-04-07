@@ -2,7 +2,7 @@ package itemHandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemUsecase"
 )
 
 type (

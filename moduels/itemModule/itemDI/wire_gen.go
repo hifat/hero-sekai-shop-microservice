@@ -9,9 +9,9 @@ package itemDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

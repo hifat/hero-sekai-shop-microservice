@@ -3,8 +3,8 @@ package itemHandler
 import (
 	"context"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemProto"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemUsecase"
 )
 
 type (

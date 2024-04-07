@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v4.25.3
-// source: moduels/item/itemProto/item.proto
+// source: moduels/itemModule/itemProto/item.proto
 
 package itemProto
 
