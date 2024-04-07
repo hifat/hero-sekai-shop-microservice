@@ -1,7 +1,7 @@
 package middlewareUsecase
 
 import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareRepository"
 )
 
 type (

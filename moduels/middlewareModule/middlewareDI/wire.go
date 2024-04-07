@@ -6,9 +6,9 @@ package middlewareDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middleware/middlewareUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
