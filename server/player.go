@@ -29,4 +29,7 @@ func (s *server) playerService() {
 
 	playerGroup.POST("/register", playerHandler.PlayerHttp.Create)
 	playerGroup.GET("/:player_id", playerHandler.PlayerHttp.GetProfile)
+
+	playerTransaction := playerV1Group.Group("/transactions")
+	playerTransaction.POST("", playerHandler.PlayerTransactionHttp.AddMoney)
 }

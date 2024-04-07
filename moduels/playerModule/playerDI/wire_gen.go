@@ -21,16 +21,19 @@ func InitPlayer(cfg *config.Config, db *mongo.Client) playerHandler.Handler {
 	iPlayerRepository := playerRepository.NewPlayer(db)
 	iPlayerUsecase := playerUsecase.NewPlayer(iPlayerRepository)
 	playerHttp := playerHandler.NewPlayerHttp(iPlayerUsecase)
+	iPlayerTransactionRepository := playerRepository.NewPlayerTransaction(db)
+	iPlayerTransactionUsecase := playerUsecase.NewPlayerTransaction(iPlayerTransactionRepository)
+	playerTransactionHttp := playerHandler.NewPlayerTransactionHttp(iPlayerTransactionUsecase)
 	playerGrpc := playerHandler.NewPlayerGrpc(iPlayerUsecase)
 	playerQueue := playerHandler.NewPlayerQueue(iPlayerUsecase)
-	handler := playerHandler.NewHandler(playerHttp, playerGrpc, playerQueue)
+	handler := playerHandler.NewHandler(playerHttp, playerTransactionHttp, playerGrpc, playerQueue)
 	return handler
 }
 
 // wire.go:
 
-var RepoSet = wire.NewSet(playerRepository.NewPlayer)
+var RepoSet = wire.NewSet(playerRepository.NewPlayer, playerRepository.NewPlayerTransaction)
 
-var UsecaseSet = wire.NewSet(playerUsecase.NewPlayer)
+var UsecaseSet = wire.NewSet(playerUsecase.NewPlayer, playerUsecase.NewPlayerTransaction)
 
-var HandlerSet = wire.NewSet(playerHandler.NewHandler, playerHandler.NewPlayerHttp, playerHandler.NewPlayerGrpc, playerHandler.NewPlayerQueue)
+var HandlerSet = wire.NewSet(playerHandler.NewHandler, playerHandler.NewPlayerHttp, playerHandler.NewPlayerTransactionHttp, playerHandler.NewPlayerGrpc, playerHandler.NewPlayerQueue)

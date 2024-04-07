@@ -14,15 +14,18 @@ import (
 
 var RepoSet = wire.NewSet(
 	playerRepository.NewPlayer,
+	playerRepository.NewPlayerTransaction,
 )
 
 var UsecaseSet = wire.NewSet(
 	playerUsecase.NewPlayer,
+	playerUsecase.NewPlayerTransaction,
 )
 
 var HandlerSet = wire.NewSet(
 	playerHandler.NewHandler,
 	playerHandler.NewPlayerHttp,
+	playerHandler.NewPlayerTransactionHttp,
 	playerHandler.NewPlayerGrpc,
 	playerHandler.NewPlayerQueue,
 )
