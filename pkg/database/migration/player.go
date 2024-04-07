@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/database"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -46,12 +46,12 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 	/* ---------------------------------- Seeder --------------------------------- */
 
 	documents := func() []any {
-		roles := []*player.Player{
+		roles := []*playerModule.Player{
 			{
 				Email:    "player001@sekai.com",
 				Password: "123456",
 				Username: "player001",
-				PlayerRoles: []player.PlayerRole{
+				PlayerRoles: []playerModule.PlayerRole{
 					{
 						RoleTitle: "player",
 						RoleCode:  0,
@@ -64,7 +64,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 				Email:    "player002@sekai.com",
 				Password: "123456",
 				Username: "player002",
-				PlayerRoles: []player.PlayerRole{
+				PlayerRoles: []playerModule.PlayerRole{
 					{
 						RoleTitle: "player",
 						RoleCode:  0,
@@ -77,7 +77,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 				Email:    "player003@sekai.com",
 				Password: "123456",
 				Username: "player003",
-				PlayerRoles: []player.PlayerRole{
+				PlayerRoles: []playerModule.PlayerRole{
 					{
 						RoleTitle: "player",
 						RoleCode:  0,
@@ -90,7 +90,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 				Email:    "admin001@sekai.com",
 				Password: "123456",
 				Username: "admin001",
-				PlayerRoles: []player.PlayerRole{
+				PlayerRoles: []playerModule.PlayerRole{
 					{
 						RoleTitle: "player",
 						RoleCode:  0,
@@ -120,7 +120,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 
 	playerTransactions := make([]any, 0)
 	for _, p := range results.InsertedIDs {
-		playerTransactions = append(playerTransactions, &player.PlayerTransaction{
+		playerTransactions = append(playerTransactions, &playerModule.PlayerTransaction{
 			PlayerId:  "player:" + p.(primitive.ObjectID).Hex(),
 			Amount:    1000,
 			CreatedAt: utils.TimeNow(),

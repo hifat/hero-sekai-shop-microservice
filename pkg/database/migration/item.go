@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/database"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -36,7 +36,7 @@ func ItemMigrate(pctx context.Context, cfg *config.Config) {
 	/* ---------------------------------- Seeder --------------------------------- */
 
 	documents := func() []any {
-		items := []*item.Item{
+		items := []*itemModule.Item{
 			{
 				Title:       "Diamon Sword",
 				Price:       1000,

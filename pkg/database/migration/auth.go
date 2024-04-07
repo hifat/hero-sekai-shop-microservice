@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -46,7 +46,7 @@ func AuthMigrate(pctx context.Context, cfg *config.Config) {
 	/* --------------------------------- Seeder --------------------------------- */
 
 	documents := func() []any {
-		roles := []*auth.Role{
+		roles := []*authModule.Role{
 			{
 				Title: "player",
 				Code:  0,

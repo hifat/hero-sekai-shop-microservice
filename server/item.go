@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemDI"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemDI"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 )
 
