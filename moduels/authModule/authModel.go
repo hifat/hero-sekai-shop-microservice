@@ -3,7 +3,7 @@ package authModule
 import (
 	"time"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -23,7 +23,7 @@ type (
 	}
 
 	ProfileIntercepter struct {
-		*player.PlayerProfile
+		*playerModule.PlayerProfile
 		Credential *Credential `json:"credential"`
 	}
 

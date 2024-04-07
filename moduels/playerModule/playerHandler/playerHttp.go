@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/request"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/response"
 )
@@ -24,7 +24,7 @@ func NewPlayerHttp(playerUsecase playerUsecase.IPlayerUsecase) *playerHttp {
 func (h *playerHttp) Create(c echo.Context) error {
 	httpCtx := request.NewHttpContext(c)
 
-	var req player.CreatePlayerReq
+	var req playerModule.CreatePlayerReq
 	if err := httpCtx.Bind(&req); err != nil {
 		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
 	}

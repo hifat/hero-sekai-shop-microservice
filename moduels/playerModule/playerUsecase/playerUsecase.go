@@ -4,17 +4,17 @@ import (
 	"context"
 
 	"github.com/jinzhu/copier"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerError"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerError"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type (
 	IPlayerUsecase interface {
-		Create(pctx context.Context, req player.CreatePlayerReq) (*player.PlayerProfile, error)
-		GetProfile(pctx context.Context, playerId string) (*player.PlayerProfile, error)
+		Create(pctx context.Context, req playerModule.CreatePlayerReq) (*playerModule.PlayerProfile, error)
+		GetProfile(pctx context.Context, playerId string) (*playerModule.PlayerProfile, error)
 	}
 
 	playerUsecase struct {
@@ -26,7 +26,7 @@ func NewPlayer(playerRepo playerRepository.IPlayerRepository) IPlayerUsecase {
 	return &playerUsecase{playerRepo}
 }
 
-func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq) (*player.PlayerProfile, error) {
+func (u *playerUsecase) Create(pctx context.Context, req playerModule.CreatePlayerReq) (*playerModule.PlayerProfile, error) {
 	isUsernameExists, err := u.playerRepo.ExistsByField(pctx, "username", req.Username)
 	if err != nil {
 		return nil, err
@@ -53,13 +53,13 @@ func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq)
 
 	req.Password = string(hashPassword)
 
-	var newPlayer player.Player
+	var newPlayer playerModule.Player
 	if err := copier.Copy(&newPlayer, &req); err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	newPlayer.PlayerRoles = []player.PlayerRole{
+	newPlayer.PlayerRoles = []playerModule.PlayerRole{
 		{
 			RoleTitle: "Player",
 			RoleCode:  0,
@@ -74,14 +74,14 @@ func (u *playerUsecase) Create(pctx context.Context, req player.CreatePlayerReq)
 	return u.GetProfile(pctx, playerId)
 }
 
-func (u *playerUsecase) GetProfile(pctx context.Context, playerId string) (*player.PlayerProfile, error) {
+func (u *playerUsecase) GetProfile(pctx context.Context, playerId string) (*playerModule.PlayerProfile, error) {
 	getPlayer, err := u.playerRepo.FirstByField(pctx, "_id", playerId)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	var res player.PlayerProfile
+	var res playerModule.PlayerProfile
 	if err := copier.Copy(&res, &getPlayer); err != nil {
 		logger.Error(err)
 		return nil, err

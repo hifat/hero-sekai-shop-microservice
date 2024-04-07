@@ -1,6 +1,6 @@
 package playerHandler
 
-import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerUsecase"
+import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
 
 type (
 	playerQueue struct {

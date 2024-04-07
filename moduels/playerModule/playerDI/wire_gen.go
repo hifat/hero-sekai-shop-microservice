@@ -9,9 +9,9 @@ package playerDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

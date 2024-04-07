@@ -3,8 +3,8 @@ package playerHandler
 import (
 	"context"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerProto"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
 )
 
 type (

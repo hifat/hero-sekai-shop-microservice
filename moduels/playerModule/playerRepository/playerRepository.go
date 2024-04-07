@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/appError"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,9 +16,9 @@ import (
 
 type (
 	IPlayerRepository interface {
-		FirstByField(pctx context.Context, field string, expected any) (*player.Player, error)
+		FirstByField(pctx context.Context, field string, expected any) (*playerModule.Player, error)
 		ExistsByField(pctx context.Context, field string, expected any) (bool, error)
-		Create(pctx context.Context, req player.Player) (string, error)
+		Create(pctx context.Context, req playerModule.Player) (string, error)
 	}
 
 	playerRepository struct {
@@ -34,7 +34,7 @@ func (r *playerRepository) dbConn() *mongo.Database {
 	return r.db.Database("player_db")
 }
 
-func (r *playerRepository) FirstByField(pctx context.Context, field string, expected any) (*player.Player, error) {
+func (r *playerRepository) FirstByField(pctx context.Context, field string, expected any) (*playerModule.Player, error) {
 	db := r.dbConn()
 	col := db.Collection("players")
 
@@ -42,7 +42,7 @@ func (r *playerRepository) FirstByField(pctx context.Context, field string, expe
 		expected = utils.ConvertToObjectId(fmt.Sprintf("%v", expected))
 	}
 
-	var result player.Player
+	var result playerModule.Player
 	if err := col.FindOne(
 		pctx,
 		bson.M{field: expected},
@@ -75,7 +75,7 @@ func (r *playerRepository) ExistsByField(pctx context.Context, field string, exp
 	return true, nil
 }
 
-func (r *playerRepository) Create(pctx context.Context, req player.Player) (string, error) {
+func (r *playerRepository) Create(pctx context.Context, req playerModule.Player) (string, error) {
 	col := r.dbConn().Collection("players")
 
 	req.CreatedAt = utils.TimeNow()
