@@ -1,4 +1,4 @@
-package inventory
+package inventoryModule
 
 type (
 	Inventory struct {

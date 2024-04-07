@@ -1,6 +1,6 @@
 package inventoryUsecase
 
-import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryRepository"
+import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryRepository"
 
 type (
 	IInventoryUsecase interface{}

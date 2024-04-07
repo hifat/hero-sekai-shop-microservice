@@ -9,9 +9,9 @@ package inventoryDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

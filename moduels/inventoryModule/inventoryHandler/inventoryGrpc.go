@@ -3,8 +3,8 @@ package inventoryHandler
 import (
 	"context"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryProto"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryUsecase"
 )
 
 type (

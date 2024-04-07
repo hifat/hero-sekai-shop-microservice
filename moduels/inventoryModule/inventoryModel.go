@@ -1,4 +1,4 @@
-package inventory
+package inventoryModule
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item"
