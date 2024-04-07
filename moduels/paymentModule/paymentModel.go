@@ -1,4 +1,4 @@
-package payment
+package paymentModule
 
 type (
 	ItemServiceReqDatum struct {
