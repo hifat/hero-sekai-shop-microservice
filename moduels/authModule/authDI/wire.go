@@ -6,9 +6,10 @@ package authDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authUsecase"
+
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

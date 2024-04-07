@@ -4,7 +4,7 @@ import (
 	"net"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventory/inventoryProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/item/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/player/playerProto"
@@ -24,8 +24,6 @@ type (
 	grpcClientFactory struct {
 		client *grpc.ClientConn
 	}
-
-	grpcAuth struct{}
 )
 
 func (g *grpcClientFactory) Auth() authProto.AuthGrpcServiceClient {

@@ -2,7 +2,7 @@ package authHandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authUsecase"
 )
 
 type (

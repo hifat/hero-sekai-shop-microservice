@@ -3,8 +3,8 @@ package authHandler
 import (
 	"context"
 
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authProto"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authUsecase"
 )
 
 type (

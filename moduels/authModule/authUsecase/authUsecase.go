@@ -1,6 +1,6 @@
 package authUsecase
 
-import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/auth/authRepository"
+import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authRepository"
 
 type (
 	IAuthUsecase interface{}
