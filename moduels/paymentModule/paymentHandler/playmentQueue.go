@@ -2,7 +2,7 @@ package paymentandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentUsecase"
 )
 
 type (

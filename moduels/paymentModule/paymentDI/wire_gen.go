@@ -9,9 +9,9 @@ package paymentDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentHandler"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentRepository"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

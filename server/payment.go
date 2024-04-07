@@ -1,7 +1,7 @@
 package server
 
 import (
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/payment/paymentDI"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentDI"
 )
 
 func (s *server) paymentService() {
