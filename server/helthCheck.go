@@ -13,7 +13,7 @@ type healthCheck struct {
 }
 
 func (s *server) healthCheckService(c echo.Context) error {
-	return response.SuccessReponse(c, http.StatusOK, &healthCheck{
+	return response.SuccessResponse(c, http.StatusOK, &healthCheck{
 		App:    s.cfg.App.Name,
 		Status: "OK",
 	})
