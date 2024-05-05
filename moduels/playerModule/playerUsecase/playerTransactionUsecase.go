@@ -10,7 +10,7 @@ import (
 
 type (
 	IPlayerTransactionUsecase interface {
-		AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) (*playerModule.PlayerTransaction, error)
+		AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) error
 	}
 
 	playerTransactionUsecase struct {
@@ -22,15 +22,15 @@ func NewPlayerTransaction(playerTransactionRepo playerRepository.IPlayerTransact
 	return &playerTransactionUsecase{playerTransactionRepo}
 }
 
-func (u *playerTransactionUsecase) AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) (*playerModule.PlayerTransaction, error) {
+func (u *playerTransactionUsecase) AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) error {
 	if _, err := u.playerTransactionRepo.Create(pctx, playerModule.PlayerTransaction{
 		PlayerId: req.PlayerId,
 		Amount:   req.Amount,
 	}); err != nil {
 		logger.Error(err)
-		return nil, err
+		return err
 	}
 
 	// Get player saving account
-	return nil, nil
+	return nil
 }

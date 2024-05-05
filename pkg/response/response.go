@@ -12,6 +12,6 @@ func ErrResponse(c echo.Context, statusCode int, message string) error {
 	return c.JSON(statusCode, &MsgResponse{Message: message})
 }
 
-func SuccessReponse(c echo.Context, statusCode int, data any) error {
+func SuccessResponse(c echo.Context, statusCode int, data any) error {
 	return c.JSON(statusCode, data)
 }

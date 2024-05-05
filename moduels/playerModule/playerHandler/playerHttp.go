@@ -34,7 +34,7 @@ func (h *playerHttp) Create(c echo.Context) error {
 		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return response.SuccessReponse(c, http.StatusCreated, res)
+	return response.SuccessResponse(c, http.StatusCreated, res)
 }
 
 func (h *playerHttp) GetProfile(c echo.Context) error {
@@ -46,5 +46,5 @@ func (h *playerHttp) GetProfile(c echo.Context) error {
 		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return response.SuccessReponse(c, http.StatusOK, res)
+	return response.SuccessResponse(c, http.StatusOK, res)
 }
