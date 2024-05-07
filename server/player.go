@@ -32,4 +32,5 @@ func (s *server) playerService() {
 
 	playerTransaction := playerV1Group.Group("/transactions")
 	playerTransaction.POST("", playerHandler.PlayerTransactionHttp.AddMoney)
+	playerTransaction.GET("/:player_id", playerHandler.PlayerTransactionHttp.GetSavingAccount)
 }

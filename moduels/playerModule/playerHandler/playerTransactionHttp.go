@@ -28,12 +28,21 @@ func (h *playerTransactionHttp) AddMoney(c echo.Context) error {
 		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	err := h.playerUsecase.AddMoney(c.Request().Context(), req)
+	res, err := h.playerUsecase.AddMoney(c.Request().Context(), req)
 	if err != nil {
 		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return response.SuccessResponse(c, http.StatusCreated, map[string]string{
-		"message": "success",
-	})
+	return response.SuccessResponse(c, http.StatusCreated, res)
+}
+
+func (h *playerTransactionHttp) GetSavingAccount(c echo.Context) error {
+	playerId := c.Param("player_id")
+
+	res, err := h.playerUsecase.GetSavingAccount(c.Request().Context(), playerId)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusCreated, res)
 }

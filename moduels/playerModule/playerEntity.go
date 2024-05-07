@@ -38,7 +38,7 @@ type (
 	PlayerTransaction struct {
 		Id        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 		PlayerId  string             `json:"player_id" bson:"player_id"`
-		Amount    float64            `json:"amout" bson:"amout"`
+		Amount    float64            `json:"amount" bson:"amount"`
 		CreatedAt *time.Time         `json:"created_at" bson:"created_at"`
 		UpdatedAt *time.Time         `json:"updated_at" bson:"updated_at"`
 	}
