@@ -50,6 +50,7 @@ func (r *playerRepository) FirstByField(pctx context.Context, field string, expe
 			"_id":        1,
 			"email":      1,
 			"username":   1,
+			"password":   1,
 			"created_at": 1,
 			"updated_at": 1,
 		}),

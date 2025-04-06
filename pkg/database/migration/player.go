@@ -45,11 +45,12 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 
 	/* ---------------------------------- Seeder --------------------------------- */
 
+	password, _ := utils.HashPassword([]byte("123456"))
 	documents := func() []any {
 		roles := []*playerModule.Player{
 			{
 				Email:    "player001@sekai.com",
-				Password: "123456",
+				Password: string(password),
 				Username: "player001",
 				PlayerRoles: []playerModule.PlayerRole{
 					{
@@ -62,7 +63,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 			},
 			{
 				Email:    "player002@sekai.com",
-				Password: "123456",
+				Password: string(password),
 				Username: "player002",
 				PlayerRoles: []playerModule.PlayerRole{
 					{
@@ -75,7 +76,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 			},
 			{
 				Email:    "player003@sekai.com",
-				Password: "123456",
+				Password: string(password),
 				Username: "player003",
 				PlayerRoles: []playerModule.PlayerRole{
 					{
@@ -88,7 +89,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 			},
 			{
 				Email:    "admin001@sekai.com",
-				Password: "123456",
+				Password: string(password),
 				Username: "admin001",
 				PlayerRoles: []playerModule.PlayerRole{
 					{

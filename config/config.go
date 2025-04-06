@@ -27,11 +27,11 @@ type (
 	}
 
 	Jwt struct {
-		AccessSecretKey   string        `mapstructure:"JWT_ACCESS_SECRET_KEY"`
-		AccessDuration    time.Duration `mapstructure:"JWT_ACCESS_DURATION"`
-		RefresehSecretKey string        `mapstructure:"JWT_REFRESEH_SECRET_KEY"`
-		RefreshDuration   time.Duration `mapstructure:"JWT_REFRESH_DURATION"`
-		ApiSecretKey      string        `mapstructure:"JWT_API_SECRET_KEY"`
+		AccessSecretKey  string        `mapstructure:"JWT_ACCESS_SECRET_KEY"`
+		AccessDuration   time.Duration `mapstructure:"JWT_ACCESS_DURATION"`
+		RefreshSecretKey string        `mapstructure:"JWT_REFRESH_SECRET_KEY"`
+		RefreshDuration  time.Duration `mapstructure:"JWT_REFRESH_DURATION"`
+		ApiSecretKey     string        `mapstructure:"JWT_API_SECRET_KEY"`
 	}
 
 	Kafka struct {

@@ -4,12 +4,11 @@ import (
 	"time"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type (
 	PlayerLoginReq struct {
-		Email    string `json:"email" form:"email" validate:"required,email,max=255"`
+		Email    string `json:"email" form:"email" validate:"required,max=255"`
 		Password string `json:"password" form:"password" validate:"required,max=32"`
 	}
 
@@ -24,15 +23,16 @@ type (
 
 	ProfileIntercepter struct {
 		*playerModule.PlayerProfile
-		Credential *Credential `json:"credential"`
+		Credential *CredentialRes `json:"credential"`
 	}
 
 	CredentialRes struct {
-		Id          primitive.ObjectID `json:"_id" bson:"_id"`
-		PlayerId    string             `json:"player_id" bson:"player_id"`
-		RoleCode    int                `json:"role_code" bson:"role_code"`
-		AccessToken string             `json:"access_token" bson:"access_token"`
-		CreatedAt   *time.Time         `json:"created_at"`
-		UpdatedAt   *time.Time         `json:"updated_at"`
+		Id           string     `json:"_id"`
+		PlayerId     string     `json:"player_id"`
+		RoleCode     int        `json:"role_code"`
+		AccessToken  string     `json:"access_token"`
+		RefreshToken string     `json:"refresh_token"`
+		CreatedAt    *time.Time `json:"created_at"`
+		UpdatedAt    *time.Time `json:"updated_at"`
 	}
 )

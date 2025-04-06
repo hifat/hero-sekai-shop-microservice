@@ -7,9 +7,9 @@ message PlayerProfile {
     string id = 1;
     string email = 2;
     string username = 3;
-    string roleCode = 4;
+    int32 roleCode = 4;
     string created_at = 5;
-    string update_at = 6;
+    string updated_at = 6;
 }
 
 message CredentialSearchReq {

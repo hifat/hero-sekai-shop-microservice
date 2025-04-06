@@ -20,8 +20,8 @@ type (
 	}
 
 	Claims struct {
-		Id       string `json:"id"`
-		RoleCode int    `json:"role_code"`
+		PlayerId string `json:"player_id"`
+		RoleCode int32  `json:"role_code"`
 	}
 
 	AuthMapClaims struct {

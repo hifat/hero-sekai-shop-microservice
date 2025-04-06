@@ -20,8 +20,8 @@ func NewPlayerGrpc(playerUsecase playerUsecase.IPlayerUsecase) *playerGrpc {
 	}
 }
 
-func (g *playerGrpc) CredentialSearch(context.Context, *playerProto.CredentialSearchReq) (*playerProto.PlayerProfile, error) {
-	return nil, nil
+func (g *playerGrpc) CredentialSearch(ctx context.Context, req *playerProto.CredentialSearchReq) (*playerProto.PlayerProfile, error) {
+	return g.playerUsecase.FindByCredential(ctx, req)
 }
 
 func (g *playerGrpc) FindOnePlayerProfileToRefresh(context.Context, *playerProto.FindOnePlayerProfileToRefreshReq) (*playerProto.PlayerProfile, error) {

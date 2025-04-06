@@ -23,7 +23,6 @@ func (s *server) authService() {
 
 	authGroup := s.app.Group("auth_v1")
 
-	_ = authHandler
-
 	authGroup.GET("", s.healthCheckService)
+	authGroup.POST("/login", authHandler.AuthHttp.Login)
 }
