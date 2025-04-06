@@ -1,10 +1,18 @@
 package jwtauth
 
 import (
+	"context"
+	"errors"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"google.golang.org/grpc/metadata"
 )
+
+var ErrTokenMalformed = jwt.ErrTokenMalformed
+var ErrTokenExpired = jwt.ErrTokenExpired
+var ErrInvalidToken = "invalid token"
 
 type (
 	AuthFactory interface {
@@ -124,4 +132,38 @@ func NewApiKey(secret string, expiredAt time.Duration, claims *Claims) AuthFacto
 			},
 		},
 	}
+}
+
+func ParseToken(secret string, tokenString string) (*AuthMapClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &AuthMapClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("expected signing method")
+		}
+
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*AuthMapClaims); ok {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
+}
+
+var apiKeyInstant string
+var once sync.Once
+
+func SetApiKey(secret string) {
+	once.Do(func() {
+		now := time.Now()
+		d := now.AddDate(1, 0, 0).Sub(now)
+		apiKeyInstant = NewApiKey(secret, d, nil).SignToken()
+	})
+}
+
+func SetApiKeyInContext(ctx *context.Context) {
+	*ctx = metadata.NewOutgoingContext(*ctx, metadata.Pairs("x-api-key", apiKeyInstant))
 }
