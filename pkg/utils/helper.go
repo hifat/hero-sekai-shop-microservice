@@ -34,7 +34,11 @@ func TimeNow() *time.Time {
 }
 
 func MustStrToTime(timeStr string) time.Time {
-	t, _ := time.Parse(time.RFC3339, timeStr)
+	t, err := time.Parse("2006-01-02 15:04:05.999 -0700 MST", timeStr)
+	if err != nil {
+		logger.Warn(err.Error())
+	}
+
 	return t
 }
 

@@ -65,6 +65,12 @@ func (u *authUsecase) Login(pctx context.Context, req *authModule.PlayerLoginReq
 	createdAt := utils.MustStrToTime(profile.CreatedAt)
 	updatedAt := utils.MustStrToTime(profile.UpdatedAt)
 
+	credential, err := u.authRepo.FindByCredentialId(pctx, credentialId)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
 	return &authModule.ProfileIntercepter{
 		PlayerProfile: &playerModule.PlayerProfile{
 			Id:        profile.Id,
@@ -74,7 +80,13 @@ func (u *authUsecase) Login(pctx context.Context, req *authModule.PlayerLoginReq
 			UpdatedAt: &updatedAt,
 		},
 		Credential: &authModule.CredentialRes{
-			Id: credentialId,
+			Id:           credentialId,
+			PlayerId:     credential.PlayerId,
+			RoleCode:     credential.RoleCode,
+			AccessToken:  credential.AccessToken,
+			RefreshToken: credential.RefreshToken,
+			CreatedAt:    credential.CreatedAt,
+			UpdatedAt:    credential.UpdatedAt,
 		},
 	}, nil
 }

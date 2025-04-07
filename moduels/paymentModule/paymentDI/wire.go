@@ -6,7 +6,7 @@ package paymentDI
 import (
 	"github.com/google/wire"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
-	paymentandler "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentHandler"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,18 +21,18 @@ var UsecaseSet = wire.NewSet(
 )
 
 var HandlerSet = wire.NewSet(
-	paymentandler.NewHandler,
-	paymentandler.Newpaymentttp,
-	paymentandler.NewPaymentGrpc,
-	paymentandler.NewPaymentQueue,
+	paymentHandler.NewHandler,
+	paymentHandler.NewPaymentHttp,
+	paymentHandler.NewPaymentGrpc,
+	paymentHandler.NewPaymentQueue,
 )
 
-func InitPayment(cfg *config.Config, db *mongo.Client) paymentandler.Handler {
+func InitPayment(cfg *config.Config, db *mongo.Client) paymentHandler.Handler {
 	wire.Build(
 		RepoSet,
 		UsecaseSet,
 		HandlerSet,
 	)
 
-	return paymentandler.Handler{}
+	return paymentHandler.Handler{}
 }

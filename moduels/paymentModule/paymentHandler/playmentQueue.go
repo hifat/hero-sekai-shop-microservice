@@ -1,4 +1,4 @@
-package paymentandler
+package paymentHandler
 
 import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"

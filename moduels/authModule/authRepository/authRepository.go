@@ -2,11 +2,12 @@ package authRepository
 
 import (
 	"context"
-	"fmt"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -15,6 +16,7 @@ type (
 	IAuthRepository interface {
 		CredentialSearch(pctx context.Context, grpcUrl string, req *playerProto.CredentialSearchReq) (*playerProto.PlayerProfile, error)
 		InsertOne(pctx context.Context, req *authModule.Credential) (string, error)
+		FindByCredentialId(pctx context.Context, credentialId string) (*authModule.Credential, error)
 	}
 
 	authRepository struct {
@@ -48,13 +50,34 @@ func (r *authRepository) InsertOne(pctx context.Context, req *authModule.Credent
 	db := r.dbConn()
 	col := db.Collection("auth")
 
+	req.CreatedAt = utils.TimeNow()
+	req.UpdatedAt = utils.TimeNow()
+
 	result, err := col.InsertOne(pctx, req)
 	if err != nil {
 		return "", err
 	}
 
-	fmt.Println(result.InsertedID.(primitive.ObjectID))
 	insertedId := result.InsertedID.(primitive.ObjectID).Hex()
 
 	return insertedId, nil
+}
+
+func (r *authRepository) FindByCredentialId(pctx context.Context, credentialId string) (*authModule.Credential, error) {
+	db := r.dbConn()
+	col := db.Collection("auth")
+
+	objectId, err := primitive.ObjectIDFromHex(credentialId)
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(authModule.Credential)
+	if err := col.FindOne(pctx, bson.M{
+		"_id": objectId,
+	}).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

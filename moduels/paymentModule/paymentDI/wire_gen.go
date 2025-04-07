@@ -17,13 +17,13 @@ import (
 
 // Injectors from wire.go:
 
-func InitPayment(cfg *config.Config, db *mongo.Client) paymentandler.Handler {
+func InitPayment(cfg *config.Config, db *mongo.Client) paymentHandler.Handler {
 	iPaymentRepository := paymentRepository.NewPayment(db)
 	iPaymentUsecase := paymentUsecase.NewPayment(iPaymentRepository)
-	paymentGrpc := paymentandler.NewPaymentGrpc(cfg, iPaymentUsecase)
-	paymentttp := paymentandler.Newpaymentttp(cfg, iPaymentUsecase)
-	paymentQueue := paymentandler.NewPaymentQueue(cfg, iPaymentUsecase)
-	handler := paymentandler.NewHandler(paymentGrpc, paymentttp, paymentQueue)
+	paymentGrpc := paymentHandler.NewPaymentGrpc(cfg, iPaymentUsecase)
+	paymentHttp := paymentHandler.NewPaymentHttp(cfg, iPaymentUsecase)
+	paymentQueue := paymentHandler.NewPaymentQueue(cfg, iPaymentUsecase)
+	handler := paymentHandler.NewHandler(paymentGrpc, paymentHttp, paymentQueue)
 	return handler
 }
 
@@ -33,4 +33,4 @@ var RepoSet = wire.NewSet(paymentRepository.NewPayment)
 
 var UsecaseSet = wire.NewSet(paymentUsecase.NewPayment)
 
-var HandlerSet = wire.NewSet(paymentandler.NewHandler, paymentandler.Newpaymentttp, paymentandler.NewPaymentGrpc, paymentandler.NewPaymentQueue)
+var HandlerSet = wire.NewSet(paymentHandler.NewHandler, paymentHandler.NewPaymentHttp, paymentHandler.NewPaymentGrpc, paymentHandler.NewPaymentQueue)

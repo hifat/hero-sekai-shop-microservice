@@ -47,12 +47,13 @@ func (r *playerRepository) FirstByField(pctx context.Context, field string, expe
 		pctx,
 		bson.M{field: expected},
 		options.FindOne().SetProjection(bson.M{
-			"_id":        1,
-			"email":      1,
-			"username":   1,
-			"password":   1,
-			"created_at": 1,
-			"updated_at": 1,
+			"_id":         1,
+			"email":       1,
+			"username":    1,
+			"password":    1,
+			"player_role": 1,
+			"created_at":  1,
+			"updated_at":  1,
 		}),
 	).Decode(&result); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
