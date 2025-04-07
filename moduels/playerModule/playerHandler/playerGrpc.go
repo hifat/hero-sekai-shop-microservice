@@ -24,8 +24,8 @@ func (g *playerGrpc) CredentialSearch(ctx context.Context, req *playerProto.Cred
 	return g.playerUsecase.FindByCredential(ctx, req)
 }
 
-func (g *playerGrpc) FindOnePlayerProfileToRefresh(context.Context, *playerProto.FindOnePlayerProfileToRefreshReq) (*playerProto.PlayerProfile, error) {
-	return nil, nil
+func (g *playerGrpc) FindOnePlayerProfileToRefresh(ctx context.Context, req *playerProto.FindOnePlayerProfileToRefreshReq) (*playerProto.PlayerProfile, error) {
+	return g.playerUsecase.FindOnePlayerToRefreshToken(ctx, req.PlayerId)
 }
 
 func (g *playerGrpc) GetPlayerSavingAccount(context.Context, *playerProto.GetPlayerSavingAccountReq) (*playerProto.GetPlayerSavingAccountRes, error) {

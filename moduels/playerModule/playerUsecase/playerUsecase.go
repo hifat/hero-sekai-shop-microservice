@@ -18,6 +18,7 @@ type (
 		Create(pctx context.Context, req playerModule.CreatePlayerReq) (*playerModule.PlayerProfile, error)
 		GetProfile(pctx context.Context, playerId string) (*playerModule.PlayerProfile, error)
 		FindByCredential(pctx context.Context, req *playerProto.CredentialSearchReq) (*playerProto.PlayerProfile, error)
+		FindOnePlayerToRefreshToken(pctx context.Context, playerId string) (*playerProto.PlayerProfile, error)
 	}
 
 	playerUsecase struct {
@@ -103,6 +104,28 @@ func (u *playerUsecase) FindByCredential(pctx context.Context, req *playerProto.
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(player.Password), []byte(req.Password)); err != nil {
+		return nil, err
+	}
+
+	roleCode := 0
+	for _, v := range player.PlayerRoles {
+		roleCode += v.RoleCode
+	}
+
+	return &playerProto.PlayerProfile{
+		Id:        player.Id.Hex(),
+		Email:     player.Email,
+		Username:  player.Username,
+		RoleCode:  int32(roleCode),
+		CreatedAt: player.CreatedAt.String(),
+		UpdatedAt: player.UpdatedAt.String(),
+	}, nil
+}
+
+func (u *playerUsecase) FindOnePlayerToRefreshToken(pctx context.Context, playerId string) (*playerProto.PlayerProfile, error) {
+	player, err := u.playerRepo.FirstByField(pctx, "_id", playerId)
+	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
