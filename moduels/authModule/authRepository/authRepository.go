@@ -17,6 +17,7 @@ type (
 		InsertOne(pctx context.Context, req *authModule.Credential) (string, error)
 		FindByCredentialId(pctx context.Context, credentialId string) (*authModule.Credential, error)
 		FindOnePlayerProfileToRefresh(pctx context.Context, grpcUrl string, req *playerProto.FindOnePlayerProfileToRefreshReq) (*playerProto.PlayerProfile, error)
+		UpdateRefreshToken(pctx context.Context, credentialId string, req *authModule.UpdateRefreshTokenReq) error
 	}
 
 	authRepository struct {
@@ -61,4 +62,28 @@ func (r *authRepository) FindByCredentialId(pctx context.Context, credentialId s
 	}
 
 	return result, nil
+}
+
+func (r *authRepository) UpdateRefreshToken(pctx context.Context, credentialId string, req *authModule.UpdateRefreshTokenReq) error {
+	db := r.dbConn()
+	col := db.Collection("auth")
+
+	_, err := col.UpdateOne(
+		pctx,
+		bson.M{
+			"_id": utils.ConvertToObjectId(credentialId),
+		},
+		bson.M{
+			"$set": bson.M{
+				"player_id":     req.PlayerId,
+				"access_token":  req.AccessToken,
+				"refresh_token": req.RefreshToken,
+				"updated_at":    req.UpdatedAt,
+			},
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

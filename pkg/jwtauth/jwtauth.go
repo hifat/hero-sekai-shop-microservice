@@ -47,7 +47,7 @@ func (a *authConcrete) SignToken() string {
 }
 
 func jwtTimeDurationCal(t time.Duration) *jwt.NumericDate {
-	return jwt.NewNumericDate(time.Now().Add(time.Duration(t * time.Second)))
+	return jwt.NewNumericDate(time.Now().Add(t))
 }
 
 func jwtTimeRepeatAdapter(t time.Duration) *jwt.NumericDate {

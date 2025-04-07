@@ -39,3 +39,20 @@ func (h *authHttp) Login(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
+
+func (h *authHttp) RefreshToken(c echo.Context) error {
+	ctx := context.Background()
+	wrapper := request.NewHttpContext(c)
+
+	req := new(authModule.RefreshTokenReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	res, err := h.authUsecase.RefreshToken(ctx, req)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}

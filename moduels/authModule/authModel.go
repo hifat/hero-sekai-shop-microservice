@@ -13,6 +13,7 @@ type (
 	}
 
 	RefreshTokenReq struct {
+		CredentialId string `json:"credential_id" form:"credential_id" validate:"required,max=64"`
 		RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required,max=500"`
 	}
 
@@ -27,12 +28,19 @@ type (
 	}
 
 	CredentialRes struct {
-		Id           string     `json:"_id"`
+		Id           string     `json:"id"`
 		PlayerId     string     `json:"player_id"`
 		RoleCode     int32      `json:"role_code"`
 		AccessToken  string     `json:"access_token"`
 		RefreshToken string     `json:"refresh_token"`
 		CreatedAt    *time.Time `json:"created_at"`
 		UpdatedAt    *time.Time `json:"updated_at"`
+	}
+
+	UpdateRefreshTokenReq struct {
+		PlayerId     string    `bson:"player_id"`
+		AccessToken  string    `bson:"access_token"`
+		RefreshToken string    `bson:"refresh_token"`
+		UpdatedAt    time.Time `bson:"updated_at"`
 	}
 )
