@@ -20,8 +20,8 @@ func NewAuthGrpc(authUsecase authUsecase.IAuthUsecase) *authGrpc {
 	}
 }
 
-func (g *authGrpc) AccessTokenSearch(context.Context, *authProto.AccessTokenSearchReq) (*authProto.AccessTokenSearchRes, error) {
-	return nil, nil
+func (g *authGrpc) AccessTokenSearch(ctx context.Context, req *authProto.AccessTokenSearchReq) (*authProto.AccessTokenSearchRes, error) {
+	return g.authUsecase.AccessTokenSearch(ctx, req.AccessToken)
 }
 
 func (g *authGrpc) RolesCount(context.Context, *authProto.RolesCountReq) (*authProto.RolesCountRes, error) {

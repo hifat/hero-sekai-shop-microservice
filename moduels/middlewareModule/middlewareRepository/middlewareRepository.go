@@ -1,9 +1,18 @@
 package middlewareRepository
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"context"
+	"errors"
+
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type (
-	IMiddlewareRepository interface{}
+	IMiddlewareRepository interface {
+		AccessTokenSearch(pctx context.Context, grpcUrl, accessToken string) error
+	}
 
 	middlewareRepository struct {
 		db *mongo.Client
@@ -12,4 +21,28 @@ type (
 
 func NewMiddleware(db *mongo.Client) IMiddlewareRepository {
 	return &middlewareRepository{db}
+}
+
+func (r *middlewareRepository) dbConn() *mongo.Database {
+	return r.db.Database("auth_db")
+}
+
+func (r *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, accessToken string) error {
+	conn, err := grpccon.NewGrpcClient(grpcUrl)
+	if err != nil {
+		return err
+	}
+
+	result, err := conn.Auth().AccessTokenSearch(pctx, &authProto.AccessTokenSearchReq{
+		AccessToken: accessToken,
+	})
+	if err != nil {
+		return err
+	}
+
+	if result == nil || !result.IsValid {
+		return errors.New("invalid access token")
+	}
+
+	return nil
 }

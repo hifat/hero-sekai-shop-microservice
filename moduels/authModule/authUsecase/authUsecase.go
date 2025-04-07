@@ -6,6 +6,7 @@ import (
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
@@ -19,6 +20,7 @@ type (
 		Login(pctx context.Context, req *authModule.PlayerLoginReq) (*authModule.ProfileIntercepter, error)
 		RefreshToken(pctx context.Context, req *authModule.RefreshTokenReq) (*authModule.ProfileIntercepter, error)
 		Logout(pctx context.Context, credentialId string) (int64, error)
+		AccessTokenSearch(pctx context.Context, accessToken string) (*authProto.AccessTokenSearchRes, error)
 	}
 
 	authUsecase struct {
@@ -166,4 +168,24 @@ func (u *authUsecase) Logout(pctx context.Context, credentialId string) (int64, 
 	}
 
 	return amount, err
+}
+
+func (u *authUsecase) AccessTokenSearch(pctx context.Context, accessToken string) (*authProto.AccessTokenSearchRes, error) {
+	credential, err := u.authRepo.FindByAccessToken(pctx, accessToken)
+	if err != nil {
+		logger.Error(err)
+		return &authProto.AccessTokenSearchRes{
+			IsValid: false,
+		}, err
+	}
+
+	if credential == nil {
+		return &authProto.AccessTokenSearchRes{
+			IsValid: false,
+		}, nil
+	}
+
+	return &authProto.AccessTokenSearchRes{
+		IsValid: true,
+	}, nil
 }
