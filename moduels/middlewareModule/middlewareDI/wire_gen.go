@@ -19,7 +19,7 @@ import (
 
 func InitMiddleware(cfg *config.Config, db *mongo.Client) middlewareHandler.Handler {
 	iMiddlewareRepository := middlewareRepository.NewMiddleware(db)
-	iMiddlewareUsecase := middlewareUsecase.NewMiddleware(iMiddlewareRepository)
+	iMiddlewareUsecase := middlewareUsecase.NewMiddleware(cfg, iMiddlewareRepository)
 	middlewareHttp := middlewareHandler.NewHttp(iMiddlewareUsecase)
 	handler := middlewareHandler.NewHandler(middlewareHttp)
 	return handler
