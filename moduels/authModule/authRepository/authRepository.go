@@ -18,6 +18,7 @@ type (
 		FindByCredentialId(pctx context.Context, credentialId string) (*authModule.Credential, error)
 		FindOnePlayerProfileToRefresh(pctx context.Context, grpcUrl string, req *playerProto.FindOnePlayerProfileToRefreshReq) (*playerProto.PlayerProfile, error)
 		UpdateRefreshToken(pctx context.Context, credentialId string, req *authModule.UpdateRefreshTokenReq) error
+		DeleteByCredentialId(pctx context.Context, credentialId string) (int64, error)
 	}
 
 	authRepository struct {
@@ -86,4 +87,18 @@ func (r *authRepository) UpdateRefreshToken(pctx context.Context, credentialId s
 	}
 
 	return nil
+}
+
+func (r *authRepository) DeleteByCredentialId(pctx context.Context, credentialId string) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("auth")
+
+	result, err := col.DeleteOne(pctx, bson.M{
+		"_id": utils.ConvertToObjectId(credentialId),
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return result.DeletedCount, nil
 }

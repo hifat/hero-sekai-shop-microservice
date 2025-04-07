@@ -2,6 +2,7 @@ package authHandler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -55,4 +56,23 @@ func (h *authHttp) RefreshToken(c echo.Context) error {
 	}
 
 	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *authHttp) Logout(c echo.Context) error {
+	ctx := context.Background()
+	wrapper := request.NewHttpContext(c)
+
+	req := new(authModule.LogoutReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	res, err := h.authUsecase.Logout(ctx, req.CredentialId)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, &response.MsgResponse{
+		Message: fmt.Sprintf("deleted count: %d", res),
+	})
 }

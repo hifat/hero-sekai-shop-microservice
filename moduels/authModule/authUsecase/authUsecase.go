@@ -18,6 +18,7 @@ type (
 	IAuthUsecase interface {
 		Login(pctx context.Context, req *authModule.PlayerLoginReq) (*authModule.ProfileIntercepter, error)
 		RefreshToken(pctx context.Context, req *authModule.RefreshTokenReq) (*authModule.ProfileIntercepter, error)
+		Logout(pctx context.Context, credentialId string) (int64, error)
 	}
 
 	authUsecase struct {
@@ -155,4 +156,14 @@ func (u *authUsecase) RefreshToken(pctx context.Context, req *authModule.Refresh
 			UpdatedAt:    credential.UpdatedAt,
 		},
 	}, nil
+}
+
+func (u *authUsecase) Logout(pctx context.Context, credentialId string) (int64, error) {
+	amount, err := u.authRepo.DeleteByCredentialId(pctx, credentialId)
+	if err != nil {
+		logger.Error(err)
+		return 0, err
+	}
+
+	return amount, err
 }
