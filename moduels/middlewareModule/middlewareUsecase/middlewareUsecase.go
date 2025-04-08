@@ -16,6 +16,7 @@ type (
 	IMiddlewareUsecase interface {
 		JwtAuth(pctx context.Context, accessToken string) (*jwtauth.AuthMapClaims, error)
 		RbacAuth(c echo.Context, cfg *config.Config, expected []int) (echo.Context, error)
+		PlayerIdParamValidation(c echo.Context, playerId, playerTokenId string) (echo.Context, error)
 	}
 
 	middlewareUsecase struct {
@@ -64,4 +65,16 @@ func (u *middlewareUsecase) RbacAuth(c echo.Context, cfg *config.Config, expecte
 	}
 
 	return nil, errors.New("permission denied")
+}
+
+func (u *middlewareUsecase) PlayerIdParamValidation(c echo.Context, playerId, playerTokenId string) (echo.Context, error) {
+	if playerTokenId == "" {
+		return nil, errors.New("player id is required")
+	}
+
+	if playerId != playerTokenId {
+		return nil, errors.New("player_id does not match")
+	}
+
+	return c, nil
 }

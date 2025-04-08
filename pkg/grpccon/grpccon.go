@@ -47,7 +47,7 @@ func NewGrpcClient(host string) (GrpcClientFactoryHandler, error) {
 
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	clientConn, err := grpc.Dial(host, opts...)
+	clientConn, err := grpc.NewClient(host, opts...)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err

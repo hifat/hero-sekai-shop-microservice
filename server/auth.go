@@ -23,9 +23,9 @@ func (s *server) authService() {
 
 	authGroup := s.app.Group("auth_v1")
 
-	authGroup.GET("",
+	authGroup.GET("/test/:player_id",
 		s.middleware.MiddlewareHttp.JwtAuth(
-			s.middleware.MiddlewareHttp.RbcaAuth(s.healthCheckService, []int{1, 0}),
+			s.middleware.MiddlewareHttp.PlayerIdParamValidation(s.healthCheckService),
 		),
 	)
 	authGroup.POST("/login", authHandler.AuthHttp.Login)
