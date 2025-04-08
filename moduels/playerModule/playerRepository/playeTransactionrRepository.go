@@ -92,7 +92,7 @@ func (r *playerTransactionRepository) Create(pctx context.Context, req playerMod
 
 func (r *playerTransactionRepository) GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error) {
 	col := r.dbConn().Collection("player_transactions")
-	fmt.Println(playerId)
+
 	filter := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{{Key: "player_id", Value: playerId}}}},
 		bson.D{

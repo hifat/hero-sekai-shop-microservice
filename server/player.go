@@ -31,6 +31,6 @@ func (s *server) playerService() {
 	playerGroup.GET("/:player_id", playerHandler.PlayerHttp.GetProfile)
 
 	playerTransaction := playerV1Group.Group("/transactions")
-	playerTransaction.POST("", playerHandler.PlayerTransactionHttp.AddMoney)
-	playerTransaction.GET("/:player_id", playerHandler.PlayerTransactionHttp.GetSavingAccount)
+	playerTransaction.POST("", playerHandler.PlayerTransactionHttp.AddMoney, s.middleware.MiddlewareHttp.JwtAuth)
+	playerTransaction.GET("/my-saving-account", playerHandler.PlayerTransactionHttp.GetSavingAccount, s.middleware.MiddlewareHttp.JwtAuth)
 }
