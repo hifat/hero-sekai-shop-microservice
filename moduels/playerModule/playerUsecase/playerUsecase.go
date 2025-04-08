@@ -2,6 +2,7 @@ package playerUsecase
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jinzhu/copier"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
@@ -104,7 +105,7 @@ func (u *playerUsecase) FindByCredential(pctx context.Context, req *playerProto.
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(player.Password), []byte(req.Password)); err != nil {
-		return nil, err
+		return nil, errors.New("invalid username or password")
 	}
 
 	roleCode := 0

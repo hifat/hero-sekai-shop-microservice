@@ -12,6 +12,7 @@ import (
 type (
 	IMiddlewareRepository interface {
 		AccessTokenSearch(pctx context.Context, grpcUrl, accessToken string) error
+		RoleCount(pctx context.Context, grpcUrl string) (int64, error)
 	}
 
 	middlewareRepository struct {
@@ -45,4 +46,18 @@ func (r *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, 
 	}
 
 	return nil
+}
+
+func (r *middlewareRepository) RoleCount(pctx context.Context, grpcUrl string) (int64, error) {
+	conn, err := grpccon.NewGrpcClient(grpcUrl)
+	if err != nil {
+		return -1, err
+	}
+
+	result, err := conn.Auth().RolesCount(pctx, &authProto.RolesCountReq{})
+	if err != nil {
+		return -1, err
+	}
+
+	return result.Count, nil
 }

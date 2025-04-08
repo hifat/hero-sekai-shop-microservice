@@ -20,6 +20,7 @@ type (
 		UpdateRefreshToken(pctx context.Context, credentialId string, req *authModule.UpdateRefreshTokenReq) error
 		DeleteByCredentialId(pctx context.Context, credentialId string) (int64, error)
 		FindByAccessToken(pctx context.Context, accessToken string) (*authModule.Credential, error)
+		RoleCount(pctx context.Context) (int64, error)
 	}
 
 	authRepository struct {
@@ -116,4 +117,16 @@ func (r *authRepository) FindByAccessToken(pctx context.Context, accessToken str
 	}
 
 	return credential, nil
+}
+
+func (r *authRepository) RoleCount(pctx context.Context) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("roles")
+
+	count, err := col.CountDocuments(pctx, bson.M{})
+	if err != nil {
+		return -1, err
+	}
+
+	return count, nil
 }
