@@ -23,11 +23,7 @@ func (s *server) authService() {
 
 	authGroup := s.app.Group("auth_v1")
 
-	authGroup.GET("/test/:player_id",
-		s.middleware.MiddlewareHttp.JwtAuth(
-			s.middleware.MiddlewareHttp.PlayerIdParamValidation(s.healthCheckService),
-		),
-	)
+	authGroup.GET("", s.healthCheckService)
 	authGroup.POST("/login", authHandler.AuthHttp.Login)
 	authGroup.POST("/refresh-token", authHandler.AuthHttp.RefreshToken)
 	authGroup.POST("/logout", authHandler.AuthHttp.Logout)

@@ -6,6 +6,7 @@ import (
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -29,6 +30,8 @@ func (r *middlewareRepository) dbConn() *mongo.Database {
 }
 
 func (r *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, accessToken string) error {
+	jwtauth.SetApiKeyInContext(&pctx)
+
 	conn, err := grpccon.NewGrpcClient(grpcUrl)
 	if err != nil {
 		return err
@@ -49,6 +52,8 @@ func (r *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, 
 }
 
 func (r *middlewareRepository) RoleCount(pctx context.Context, grpcUrl string) (int64, error) {
+	jwtauth.SetApiKeyInContext(&pctx)
+
 	conn, err := grpccon.NewGrpcClient(grpcUrl)
 	if err != nil {
 		return -1, err
