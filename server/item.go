@@ -34,4 +34,16 @@ func (s *server) itemService() {
 	))
 	itemGroup.GET("/item", itemHandler.ItemHttp.Find)
 	itemGroup.GET("/item/:item_id", itemHandler.ItemHttp.FindById)
+	itemGroup.PUT("/item/:item_id", s.middleware.MiddlewareHttp.JwtAuth(
+		s.middleware.MiddlewareHttp.RbcaAuth(
+			itemHandler.ItemHttp.Update,
+			[]int{1, 0},
+		),
+	))
+	itemGroup.PATCH("/item/:item_id/usage-status", s.middleware.MiddlewareHttp.JwtAuth(
+		s.middleware.MiddlewareHttp.RbcaAuth(
+			itemHandler.ItemHttp.UpdateUsageStatus,
+			[]int{1, 0},
+		),
+	))
 }

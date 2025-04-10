@@ -67,3 +67,41 @@ func (h *itemHttp) Find(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusCreated, res)
 }
+
+func (h *itemHttp) Update(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.NewHttpContext(c)
+
+	itemId := c.Param("item_id")
+
+	req := new(itemModule.ItemUpdateReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	err := h.itemUsecase.Update(ctx, itemId, req)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, nil)
+}
+
+func (h *itemHttp) UpdateUsageStatus(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.NewHttpContext(c)
+
+	itemId := c.Param("item_id")
+
+	req := new(itemModule.EnableOrDisableItemReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	err := h.itemUsecase.UpdateUsageStatus(ctx, itemId, req)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, nil)
+}

@@ -20,6 +20,8 @@ type (
 		Create(pctx context.Context, req *itemModule.CreateItemReq) (*itemModule.ItemShowCase, error)
 		FindById(pctx context.Context, itemId string) (*itemModule.ItemShowCase, error)
 		Find(pctx context.Context, basePaginateUrl string, req *itemModule.ItemSearchReq) (*model.PaginateRes, error)
+		Update(pctx context.Context, itemId string, req *itemModule.ItemUpdateReq) error
+		UpdateUsageStatus(pctx context.Context, itemId string, req *itemModule.EnableOrDisableItemReq) error
 	}
 
 	itemUsecase struct {
@@ -32,7 +34,7 @@ func NewItem(itemRepo itemRepository.IItemRepository) IItemUsecase {
 }
 
 func (u *itemUsecase) Create(pctx context.Context, req *itemModule.CreateItemReq) (*itemModule.ItemShowCase, error) {
-	isUnique, err := u.itemRepo.IsUnique(pctx, req.Title)
+	isUnique, err := u.itemRepo.IsUnique(pctx, req.Title, "")
 	if err != nil {
 		logger.Error(err)
 		return nil, err
@@ -52,7 +54,6 @@ func (u *itemUsecase) Create(pctx context.Context, req *itemModule.CreateItemReq
 }
 
 func (u *itemUsecase) FindById(pctx context.Context, itemId string) (*itemModule.ItemShowCase, error) {
-
 	result, err := u.itemRepo.FindById(pctx, itemId)
 	if err != nil {
 		logger.Error(err)
@@ -102,7 +103,6 @@ func (u *itemUsecase) Find(pctx context.Context, basePaginateUrl string, req *it
 	findItemsOpts = append(findItemsOpts, options.Find().SetLimit(req.Limit))
 
 	// Find
-	fmt.Printf("%+v", findItemsFilter)
 	results, err := u.itemRepo.Find(pctx, findItemsFilter, findItemsOpts)
 	if err != nil {
 		logger.Error(err)
@@ -145,4 +145,33 @@ func (u *itemUsecase) Find(pctx context.Context, basePaginateUrl string, req *it
 			Href:  fmt.Sprintf("%s?limit=%d&title=%s&start=%s", basePaginateUrl, req.Limit, req.Title, start),
 		},
 	}, nil
+}
+
+func (u *itemUsecase) Update(pctx context.Context, itemId string, req *itemModule.ItemUpdateReq) error {
+	isUnique, err := u.itemRepo.IsUnique(pctx, req.Title, itemId)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	if !isUnique {
+		return errors.New("duplicated item")
+	}
+
+	err = u.itemRepo.Update(pctx, itemId, req)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
+}
+
+func (u *itemUsecase) UpdateUsageStatus(pctx context.Context, itemId string, req *itemModule.EnableOrDisableItemReq) error {
+	if err := u.itemRepo.UpdateUsageStatus(pctx, itemId, req.UsageStatus); err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
 }
