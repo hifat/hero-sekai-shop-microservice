@@ -81,9 +81,7 @@ func (u *itemUsecase) Find(pctx context.Context, basePaginateUrl string, req *it
 		}})
 	}
 
-	fmt.Printf("\n %s \n", req.Title)
 	if req.Title != "" {
-		fmt.Println("klsdjflksdjfklsdjf")
 		findItemsFilter = append(findItemsFilter, bson.E{Key: "title", Value: primitive.Regex{
 			Pattern: req.Title,
 			Options: "i",
