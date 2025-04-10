@@ -32,5 +32,6 @@ func (s *server) itemService() {
 			[]int{1, 0},
 		),
 	))
+	itemGroup.GET("/item", itemHandler.ItemHttp.Find)
 	itemGroup.GET("/item/:item_id", itemHandler.ItemHttp.FindById)
 }

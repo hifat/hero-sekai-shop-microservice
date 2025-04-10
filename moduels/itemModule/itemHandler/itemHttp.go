@@ -50,3 +50,20 @@ func (h *itemHttp) FindById(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusCreated, res)
 }
+
+func (h *itemHttp) Find(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.NewHttpContext(c)
+	req := new(itemModule.ItemSearchReq)
+
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	res, err := h.itemUsecase.Find(ctx, h.cfg.Paginate.ItemNextPageBasedUrl, req)
+	if err != nil {
+		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusCreated, res)
+}

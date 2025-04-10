@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type (
@@ -16,6 +17,8 @@ type (
 		IsUnique(pctx context.Context, title string) (bool, error)
 		Create(pctx context.Context, req *itemModule.CreateItemReq) (string, error)
 		FindById(pctx context.Context, itemId string) (*itemModule.Item, error)
+		Find(pctx context.Context, filter primitive.D, opts []*options.FindOptions) ([]*itemModule.ItemShowCase, error)
+		Count(pctx context.Context, filter primitive.D) (int64, error)
 	}
 
 	itemRepository struct {
@@ -81,4 +84,39 @@ func (r *itemRepository) FindById(pctx context.Context, itemId string) (*itemMod
 	}
 
 	return result, nil
+}
+
+func (r *itemRepository) Find(pctx context.Context, filter primitive.D, opts []*options.FindOptions) ([]*itemModule.ItemShowCase, error) {
+	db := r.dbConn()
+	col := db.Collection("items")
+
+	cursors, err := col.Find(pctx, filter, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]*itemModule.ItemShowCase, 0)
+	for cursors.Next(pctx) {
+		result := new(itemModule.Item)
+		if err := cursors.Decode(result); err != nil {
+			return nil, err
+		}
+
+		results = append(results, &itemModule.ItemShowCase{
+			ItemId:   result.Id.Hex(),
+			Title:    result.Title,
+			Price:    result.Price,
+			Damage:   result.Damage,
+			ImageUrl: result.ImageUrl,
+		})
+	}
+
+	return results, nil
+}
+
+func (r *itemRepository) Count(pctx context.Context, filter primitive.D) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("items")
+
+	return col.CountDocuments(pctx, filter)
 }
