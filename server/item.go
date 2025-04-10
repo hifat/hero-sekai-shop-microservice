@@ -26,4 +26,11 @@ func (s *server) itemService() {
 	_ = itemHandler
 
 	itemGroup.GET("", s.healthCheckService)
+	itemGroup.POST("/item", s.middleware.MiddlewareHttp.JwtAuth(
+		s.middleware.MiddlewareHttp.RbcaAuth(
+			itemHandler.ItemHttp.Create,
+			[]int{1, 0},
+		),
+	))
+	itemGroup.GET("/item/:item_id", itemHandler.ItemHttp.FindById)
 }
