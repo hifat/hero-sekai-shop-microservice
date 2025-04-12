@@ -71,8 +71,6 @@ func (r *inventoryRepository) FindPlayerItems(pctx context.Context, filter primi
 		results = append(results, result)
 	}
 
-	utils.Debug(results)
-
 	return results, nil
 }
 
