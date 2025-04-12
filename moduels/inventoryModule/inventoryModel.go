@@ -13,11 +13,11 @@ type (
 
 	ItemInInventory struct {
 		InventoryId string `json:"inventory_id"`
+		PlayerId    string `json:"player_id"`
 		*itemModule.ItemShowCase
 	}
 
-	PlayerInventory struct {
-		PlayerId string `json:"player_id"`
-		*model.PaginateRes
+	InventorySearchReq struct {
+		model.PaginateReq
 	}
 )

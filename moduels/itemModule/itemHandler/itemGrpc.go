@@ -20,6 +20,6 @@ func NewItemGrpc(itemUsecase itemUsecase.IItemUsecase) *itemGrpc {
 	}
 }
 
-func (g *itemGrpc) FindItemInIds(context.Context, *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error) {
-	return nil, nil
+func (g *itemGrpc) FindItemInIds(ctx context.Context, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error) {
+	return g.itemUsecase.FindItemInIds(ctx, req)
 }

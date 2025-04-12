@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
@@ -22,6 +23,7 @@ type (
 		Find(pctx context.Context, basePaginateUrl string, req *itemModule.ItemSearchReq) (*model.PaginateRes, error)
 		Update(pctx context.Context, itemId string, req *itemModule.ItemUpdateReq) error
 		UpdateUsageStatus(pctx context.Context, itemId string, req *itemModule.EnableOrDisableItemReq) error
+		FindItemInIds(pctx context.Context, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error)
 	}
 
 	itemUsecase struct {
@@ -174,4 +176,38 @@ func (u *itemUsecase) UpdateUsageStatus(pctx context.Context, itemId string, req
 	}
 
 	return nil
+}
+
+func (u *itemUsecase) FindItemInIds(pctx context.Context, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error) {
+	filter := bson.D{}
+
+	objectIds := make([]primitive.ObjectID, 0)
+	for _, itemId := range req.Ids {
+		objectIds = append(objectIds, utils.ConvertToObjectId(itemId))
+	}
+
+	filter = append(filter, bson.E{Key: "_id", Value: bson.D{
+		{Key: "$in", Value: objectIds},
+	}})
+
+	results, err := u.itemRepo.Find(pctx, filter, nil)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	resultToRes := make([]*itemProto.Item, 0)
+	for _, result := range results {
+		resultToRes = append(resultToRes, &itemProto.Item{
+			Id:       result.ItemId,
+			Title:    result.Title,
+			Price:    result.Price,
+			Damage:   result.Damage,
+			ImageUrl: result.ImageUrl,
+		})
+	}
+
+	return &itemProto.FindItemsInIdsRes{
+		Items: resultToRes,
+	}, nil
 }
