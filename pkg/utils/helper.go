@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Debug(object any) {
@@ -30,4 +31,17 @@ func GetEnvPath() (string, string) {
 func TimeNow() *time.Time {
 	t := time.Now()
 	return &t
+}
+
+func MustStrToTime(timeStr string) time.Time {
+	t, err := time.Parse("2006-01-02 15:04:05.999 -0700 MST", timeStr)
+	if err != nil {
+		logger.Warn(err.Error())
+	}
+
+	return t
+}
+
+func HashPassword(password []byte) ([]byte, error) {
+	return bcrypt.GenerateFromPassword(password, 12)
 }

@@ -1,15 +1,15 @@
-package paymentandler
+package paymentHandler
 
 type Handler struct {
 	PaymentGrpc  *paymentGrpc
-	paymentttp   *paymentttp
+	paymentHttp  *paymentHttp
 	PaymentQueue *paymentQueue
 }
 
-func NewHandler(PaymentGrpc *paymentGrpc, paymentttp *paymentttp, PaymentQueue *paymentQueue) Handler {
+func NewHandler(PaymentGrpc *paymentGrpc, paymentHttp *paymentHttp, PaymentQueue *paymentQueue) Handler {
 	return Handler{
 		PaymentGrpc,
-		paymentttp,
+		paymentHttp,
 		PaymentQueue,
 	}
 }

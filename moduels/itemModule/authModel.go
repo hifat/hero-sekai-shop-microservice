@@ -6,7 +6,7 @@ type (
 	CreateItemReq struct {
 		Title    string  `json:"title" validate:"required,max=64"`
 		Price    float64 `json:"price" validate:"required"`
-		Damage   int     `json:"damage" validate:"required"`
+		Damage   int32   `json:"damage" validate:"required"`
 		ImageUrl string  `json:"image_url" validate:"required,max=255"`
 	}
 
@@ -14,12 +14,12 @@ type (
 		ItemId   string  `json:"item_id"`
 		Title    string  `json:"title"`
 		Price    float64 `json:"price"`
-		Damage   int     `json:"damage"`
+		Damage   int32   `json:"damage"`
 		ImageUrl string  `json:"image_url"`
 	}
 
 	ItemSearchReq struct {
-		Title string `json:"title"`
+		Title string `query:"title" validate:"max=64"`
 		model.PaginateReq
 	}
 

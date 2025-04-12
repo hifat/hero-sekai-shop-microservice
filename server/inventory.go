@@ -23,7 +23,6 @@ func (s *server) inventoryService() {
 
 	inventoryGroup := s.app.Group("inventory_v1")
 
-	_ = inventoryHandler
-
 	inventoryGroup.GET("", s.healthCheckService)
+	inventoryGroup.GET("/inventory/my-item", inventoryHandler.InventoryHttp.FindPlayerItems, s.middleware.MiddlewareHttp.JwtAuth)
 }

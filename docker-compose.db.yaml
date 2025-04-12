@@ -3,7 +3,7 @@ version: '3.8'
 services:
    auth-db:
       image: mongo
-      restart: always
+      # restart: always
       container_name: auth-db
       ports:
         - 27017:27017
@@ -13,7 +13,7 @@ services:
 
    item-db:
       image: mongo
-      restart: always
+      # restart: always
       container_name: item-db
       ports:
         - 27018:27017
@@ -23,7 +23,7 @@ services:
 
    player-db:
       image: mongo
-      restart: always
+      # restart: always
       container_name: player-db
       ports:
         - 27019:27017
@@ -33,7 +33,7 @@ services:
 
    inventory-db:
       image: mongo
-      restart: always
+      # restart: always
       container_name: inventory-db
       ports:
         - 27020:27017
@@ -43,7 +43,7 @@ services:
 
    payment-db:
       image: mongo
-      restart: always
+      # restart: always
       container_name: payment-db
       ports:
         - 27021:27017

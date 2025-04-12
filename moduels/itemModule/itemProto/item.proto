@@ -4,7 +4,7 @@ package itemProto;
 option go_package = "./itemProto";
 
 message FindItemsInIdsReq {
-    repeated int32 items = 1;
+    repeated string ids = 1;
 }
 
 message FindItemsInIdsRes {

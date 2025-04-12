@@ -1,11 +1,11 @@
 package middlewareHandler
 
 type Handler struct {
-	middlewareHttp *middlewareHttp
+	MiddlewareHttp *middlewareHttp
 }
 
-func NewHandler(middlewareHttp *middlewareHttp) Handler {
+func NewHandler(MiddlewareHttp *middlewareHttp) Handler {
 	return Handler{
-		middlewareHttp,
+		MiddlewareHttp,
 	}
 }

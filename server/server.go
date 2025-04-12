@@ -14,6 +14,7 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareDI"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/middlewareModule/middlewareHandler"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/exp/slog"
@@ -53,6 +54,8 @@ func Start(pctx context.Context, cfg *config.Config, db *mongo.Client) {
 		middleware: middlewareDI.InitMiddleware(cfg, db),
 	}
 
+	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
+
 	s.app.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{
 		Skipper:      echoMiddleware.DefaultSkipper,
 		ErrorMessage: "Error: Request Timeout",
@@ -83,7 +86,7 @@ func Start(pctx context.Context, cfg *config.Config, db *mongo.Client) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	s.app.Use(echoMiddleware.Logger())
+	// s.app.Use(echoMiddleware.Logger())
 
 	go s.gracefulShutdown(pctx, quit)
 

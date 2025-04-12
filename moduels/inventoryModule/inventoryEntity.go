@@ -2,7 +2,7 @@ package inventoryModule
 
 type (
 	Inventory struct {
-		Id       string `json:"id" bson:"id"`
+		Id       string `json:"id" bson:"_id"`
 		PlayerId string `json:"player_id" bson:"player_id"`
 		ItemId   string `json:"item_id" bson:"item_id"`
 	}

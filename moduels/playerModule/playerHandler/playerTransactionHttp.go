@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/request"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/response"
 )
@@ -28,6 +29,10 @@ func (h *playerTransactionHttp) AddMoney(c echo.Context) error {
 		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
 	}
 
+	claim := c.Get("credential").(*jwtauth.AuthMapClaims)
+
+	req.PlayerId = claim.PlayerId
+
 	res, err := h.playerUsecase.AddMoney(c.Request().Context(), req)
 	if err != nil {
 		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
@@ -37,9 +42,9 @@ func (h *playerTransactionHttp) AddMoney(c echo.Context) error {
 }
 
 func (h *playerTransactionHttp) GetSavingAccount(c echo.Context) error {
-	playerId := c.Param("player_id")
+	claim := c.Get("credential").(*jwtauth.AuthMapClaims)
 
-	res, err := h.playerUsecase.GetSavingAccount(c.Request().Context(), playerId)
+	res, err := h.playerUsecase.GetSavingAccount(c.Request().Context(), claim.PlayerId)
 	if err != nil {
 		return response.ErrResponse(c, http.StatusInternalServerError, err.Error())
 	}
