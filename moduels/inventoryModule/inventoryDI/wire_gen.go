@@ -19,7 +19,7 @@ import (
 
 func InitInventory(cfg *config.Config, db *mongo.Client) inventoryHandler.Handler {
 	iInventoryRepository := inventoryRepository.NewInventory(db)
-	iInventoryUsecase := inventoryUsecase.NewInventory(iInventoryRepository)
+	iInventoryUsecase := inventoryUsecase.NewInventory(cfg, iInventoryRepository)
 	inventoryHttp := inventoryHandler.NewInventoryHttp(cfg, iInventoryUsecase)
 	inventoryGrpc := inventoryHandler.NewInventoryGrpc(iInventoryUsecase)
 	inventoryQueue := inventoryHandler.NewInventoryQueue(cfg, iInventoryUsecase)

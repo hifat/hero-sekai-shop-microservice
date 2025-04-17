@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
@@ -16,19 +18,20 @@ import (
 
 type (
 	IInventoryUsecase interface {
-		FindPlayerItems(pctx context.Context, basePaginationUrl, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error)
+		FindPlayerItems(pctx context.Context, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error)
 	}
 
 	inventoryUsecase struct {
+		cfg           *config.Config
 		inventoryRepo inventoryRepository.IInventoryRepository
 	}
 )
 
-func NewInventory(inventoryRepo inventoryRepository.IInventoryRepository) IInventoryUsecase {
-	return &inventoryUsecase{inventoryRepo}
+func NewInventory(cfg *config.Config, inventoryRepo inventoryRepository.IInventoryRepository) IInventoryUsecase {
+	return &inventoryUsecase{cfg, inventoryRepo}
 }
 
-func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, basePaginateUrl, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error) {
+func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error) {
 	// Filter
 	filter := bson.D{}
 
@@ -54,15 +57,50 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, basePaginateUrl
 		return nil, err
 	}
 
+	itemData, err := u.inventoryRepo.FindItemInIds(pctx, u.cfg.Grpc.ItemUrl, &itemProto.FindItemsInIdsReq{
+		Ids: func() []string {
+			itemIds := make([]string, 0, len(inventories))
+			for _, v := range inventories {
+				itemIds = append(itemIds, v.ItemId)
+			}
+
+			return itemIds
+		}(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	itemMap := make(map[string]*itemModule.ItemShowCase, len(itemData.Items))
+	for _, v := range itemData.Items {
+		itemMap[v.Id] = &itemModule.ItemShowCase{
+			ItemId:   v.Id,
+			Title:    v.Title,
+			Price:    v.Price,
+			Damage:   v.Damage,
+			ImageUrl: v.ImageUrl,
+		}
+	}
+
 	results := make([]*inventoryModule.ItemInInventory, 0)
 	for _, inventory := range inventories {
-		results = append(results, &inventoryModule.ItemInInventory{
+		inventoryRes := &inventoryModule.ItemInInventory{
 			InventoryId: inventory.Id,
 			PlayerId:    inventory.PlayerId,
-			ItemShowCase: &itemModule.ItemShowCase{
-				ItemId: inventory.ItemId,
-			},
-		})
+		}
+
+		item, ok := itemMap[inventory.ItemId]
+		if ok {
+			inventoryRes.ItemShowCase = &itemModule.ItemShowCase{
+				ItemId:   inventory.ItemId,
+				Title:    item.Title,
+				Price:    item.Price,
+				Damage:   item.Damage,
+				ImageUrl: item.ImageUrl,
+			}
+		}
+
+		results = append(results, inventoryRes)
 	}
 
 	// Count
@@ -78,7 +116,7 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, basePaginateUrl
 			Total: total,
 			Limit: req.Limit,
 			First: model.FirstPaginate{
-				Href: fmt.Sprintf("%s?limit=%d", basePaginateUrl, req.Limit),
+				Href: fmt.Sprintf("%s?limit=%d", u.cfg.Paginate.InventoryNextPageBasedUrl, req.Limit),
 			},
 			Next: model.NextPaginate{
 				Start: "",
@@ -94,11 +132,11 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, basePaginateUrl
 		Total: total,
 		Limit: req.Limit,
 		First: model.FirstPaginate{
-			Href: fmt.Sprintf("%s/my-item?limit=%d", basePaginateUrl, req.Limit),
+			Href: fmt.Sprintf("%s/my-item?limit=%d", u.cfg.Paginate.InventoryNextPageBasedUrl, req.Limit),
 		},
 		Next: model.NextPaginate{
 			Start: start,
-			Href:  fmt.Sprintf("%s/my-item?limit=%d&start=%s", basePaginateUrl, req.Limit, start),
+			Href:  fmt.Sprintf("%s/my-item?limit=%d&start=%s", u.cfg.Paginate.InventoryNextPageBasedUrl, req.Limit, start),
 		},
 	}, nil
 }
