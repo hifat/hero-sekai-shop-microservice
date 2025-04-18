@@ -21,9 +21,8 @@ func InitInventory(cfg *config.Config, db *mongo.Client) inventoryHandler.Handle
 	iInventoryRepository := inventoryRepository.NewInventory(db)
 	iInventoryUsecase := inventoryUsecase.NewInventory(cfg, iInventoryRepository)
 	inventoryHttp := inventoryHandler.NewInventoryHttp(cfg, iInventoryUsecase)
-	inventoryGrpc := inventoryHandler.NewInventoryGrpc(iInventoryUsecase)
 	inventoryQueue := inventoryHandler.NewInventoryQueue(cfg, iInventoryUsecase)
-	handler := inventoryHandler.NewHandler(inventoryHttp, inventoryGrpc, inventoryQueue)
+	handler := inventoryHandler.NewHandler(inventoryHttp, inventoryQueue)
 	return handler
 }
 
@@ -33,4 +32,4 @@ var RepoSet = wire.NewSet(inventoryRepository.NewInventory)
 
 var UsecaseSet = wire.NewSet(inventoryUsecase.NewInventory)
 
-var HandlerSet = wire.NewSet(inventoryHandler.NewHandler, inventoryHandler.NewInventoryHttp, inventoryHandler.NewInventoryGrpc, inventoryHandler.NewInventoryQueue)
+var HandlerSet = wire.NewSet(inventoryHandler.NewHandler, inventoryHandler.NewInventoryHttp, inventoryHandler.NewInventoryQueue)

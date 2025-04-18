@@ -8,7 +8,6 @@ import (
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authProto"
-	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule/inventoryProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
@@ -23,7 +22,6 @@ type (
 		Auth() authProto.AuthGrpcServiceClient
 		Player() playerProto.PlayerGrpcServiceClient
 		Item() itemProto.ItemGrpcServiceClient
-		Inventory() inventoryProto.InventoryGrpcServiceClient
 	}
 
 	grpcClientFactory struct {
@@ -69,10 +67,6 @@ func (g *grpcClientFactory) Player() playerProto.PlayerGrpcServiceClient {
 
 func (g *grpcClientFactory) Item() itemProto.ItemGrpcServiceClient {
 	return itemProto.NewItemGrpcServiceClient(g.client)
-}
-
-func (g *grpcClientFactory) Inventory() inventoryProto.InventoryGrpcServiceClient {
-	return inventoryProto.NewInventoryGrpcServiceClient(g.client)
 }
 
 func NewGrpcClient(host string) (GrpcClientFactoryHandler, error) {

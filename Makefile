@@ -11,3 +11,9 @@ seed:
 
 db-up:
 	docker compose -f docker-compose.db.yaml up -d
+
+compose-up-db:
+	docker compose -f docker-compose.db.yaml up -d
+
+compose-up-kafka:
+	docker compose -f docker-compose.kafka.yaml up -d

@@ -23,7 +23,6 @@ var UsecaseSet = wire.NewSet(
 var HandlerSet = wire.NewSet(
 	inventoryHandler.NewHandler,
 	inventoryHandler.NewInventoryHttp,
-	inventoryHandler.NewInventoryGrpc,
 	inventoryHandler.NewInventoryQueue,
 )
 
