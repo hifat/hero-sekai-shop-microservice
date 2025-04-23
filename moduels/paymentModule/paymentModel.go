@@ -1,12 +1,27 @@
 package paymentModule
 
 type (
+	ItemServiceReq struct {
+		Items []*ItemServiceReqDatum `json:"items" validate:"required"`
+	}
+
 	ItemServiceReqDatum struct {
 		ItemId string  `json:"item_id" validate:"required,max=64"`
 		Price  float64 `json:"price"`
 	}
 
-	ItemServiceReq struct {
-		Items []*ItemServiceReqDatum `json:"items" validate:"required"`
+	PaymentTransFerReq struct {
+		PlayerId string `json:"player_id"`
+		ItemId   string `json:"item_id"`
+		Amount   string `json:"amount"`
+	}
+
+	PaymentTransferReq struct {
+		InventoryId   string `json:"inventory_id"`
+		TransactionId string `json:"transaction_id"`
+		PlayerId      string `json:"player_id"`
+		ItemId        string `json:"item_id"`
+		Amount        int64  `json:"amount"`
+		Error         string `json:"error"`
 	}
 )

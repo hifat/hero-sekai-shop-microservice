@@ -5,6 +5,7 @@ import (
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
@@ -33,6 +34,40 @@ func NewInventory(db *mongo.Client) IInventoryRepository {
 
 func (r *inventoryRepository) dbConn() *mongo.Database {
 	return r.db.Database("inventory_db")
+}
+
+func (r *inventoryRepository) GetOffset(pctx context.Context) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("player_inventory_queue")
+
+	result := new(model.KafkaOffset)
+	if err := col.FindOne(pctx, bson.M{}).
+		Decode(result); err != nil {
+		return -1, err
+	}
+
+	return result.Offset, nil
+}
+
+func (r *inventoryRepository) UpsertOffset(pctx context.Context, offset int64) error {
+	db := r.dbConn()
+	col := db.Collection("player_inventory_queue")
+
+	_, err := col.UpdateOne(
+		pctx,
+		bson.M{},
+		bson.M{
+			"$set": bson.M{
+				"offset": offset,
+			},
+		},
+		options.Update().SetUpsert(true),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *inventoryRepository) FindItemInIds(pctx context.Context, grpcUrl string, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error) {

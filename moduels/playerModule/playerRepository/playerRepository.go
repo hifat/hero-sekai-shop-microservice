@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/appError"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
@@ -19,6 +20,8 @@ type (
 		FirstByField(pctx context.Context, field string, expected any) (*playerModule.Player, error)
 		ExistsByField(pctx context.Context, field string, expected any) (bool, error)
 		Create(pctx context.Context, req playerModule.Player) (string, error)
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 	}
 
 	playerRepository struct {
@@ -32,6 +35,40 @@ func NewPlayer(db *mongo.Client) IPlayerRepository {
 
 func (r *playerRepository) dbConn() *mongo.Database {
 	return r.db.Database("player_db")
+}
+
+func (r *playerRepository) GetOffset(pctx context.Context) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("player_transactions_queue")
+
+	result := new(model.KafkaOffset)
+	if err := col.FindOne(pctx, bson.M{}).
+		Decode(result); err != nil {
+		return -1, err
+	}
+
+	return result.Offset, nil
+}
+
+func (r *playerRepository) UpsertOffset(pctx context.Context, offset int64) error {
+	db := r.dbConn()
+	col := db.Collection("player_transactions_queue")
+
+	_, err := col.UpdateOne(
+		pctx,
+		bson.M{},
+		bson.M{
+			"$set": bson.M{
+				"offset": offset,
+			},
+		},
+		options.Update().SetUpsert(true),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *playerRepository) FirstByField(pctx context.Context, field string, expected any) (*playerModule.Player, error) {
