@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/appError"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
@@ -18,8 +20,10 @@ type (
 	IPlayerTransactionRepository interface {
 		FirstByField(pctx context.Context, field string, expected any) (*playerModule.PlayerTransaction, error)
 		ExistsByField(pctx context.Context, field string, expected any) (bool, error)
-		Create(pctx context.Context, req playerModule.PlayerTransaction) (string, error)
+		Create(pctx context.Context, req *playerModule.PlayerTransaction) (string, error)
 		GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error)
+		DeleteById(pctx context.Context, transactionId string) error
+		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
 	}
 
 	playerTransactionRepository struct {
@@ -76,7 +80,7 @@ func (r *playerTransactionRepository) ExistsByField(pctx context.Context, field 
 	return true, nil
 }
 
-func (r *playerTransactionRepository) Create(pctx context.Context, req playerModule.PlayerTransaction) (string, error) {
+func (r *playerTransactionRepository) Create(pctx context.Context, req *playerModule.PlayerTransaction) (string, error) {
 	col := r.dbConn().Collection("player_transactions")
 
 	req.CreatedAt = utils.TimeNow()
@@ -125,4 +129,17 @@ func (r *playerTransactionRepository) GetSavingAccount(pctx context.Context, pla
 	}
 
 	return &result, nil
+}
+
+func (r *playerTransactionRepository) DeleteById(pctx context.Context, transactionId string) error {
+	col := r.dbConn().Collection("player_transactions")
+
+	_, err := col.DeleteOne(pctx, bson.M{
+		"_id": utils.ConvertToObjectId(transactionId),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

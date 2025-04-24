@@ -10,18 +10,18 @@ type (
 		Price  float64 `json:"price"`
 	}
 
-	PaymentTransFerReq struct {
+	PaymentTransferReq struct {
 		PlayerId string `json:"player_id"`
 		ItemId   string `json:"item_id"`
 		Amount   string `json:"amount"`
 	}
 
-	PaymentTransferReq struct {
-		InventoryId   string `json:"inventory_id"`
-		TransactionId string `json:"transaction_id"`
-		PlayerId      string `json:"player_id"`
-		ItemId        string `json:"item_id"`
-		Amount        int64  `json:"amount"`
-		Error         string `json:"error"`
+	PaymentTransferRes struct {
+		InventoryId   string  `json:"inventory_id"`
+		TransactionId string  `json:"transaction_id"`
+		PlayerId      string  `json:"player_id"`
+		ItemId        string  `json:"item_id"`
+		Amount        float64 `json:"amount"`
+		Error         string  `json:"error"`
 	}
 )

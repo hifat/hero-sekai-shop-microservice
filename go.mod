@@ -2,14 +2,11 @@ module gitnub.com/hifat/hero-sekai-shop-microservice
 
 go 1.24.0
 
-toolchain go1.24.0
-
 require (
 	github.com/IBM/sarama v1.45.1
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/wire v0.6.0
-	github.com/hifat/goroger-core v0.0.0-20250418071651-e3997eedcf25
 	github.com/jinzhu/copier v0.4.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/spf13/viper v1.18.2
@@ -52,6 +49,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

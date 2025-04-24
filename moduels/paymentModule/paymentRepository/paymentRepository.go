@@ -3,8 +3,10 @@ package paymentRepository
 import (
 	"context"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,6 +19,8 @@ type (
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
 		FindItemInIds(pctx context.Context, grpcUrl string, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error)
+		DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error
+		RollbackDockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error
 	}
 
 	paymentRepository struct {
