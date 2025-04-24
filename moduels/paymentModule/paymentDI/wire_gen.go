@@ -19,7 +19,7 @@ import (
 
 func InitPayment(cfg *config.Config, db *mongo.Client) paymentHandler.Handler {
 	iPaymentRepository := paymentRepository.NewPayment(db)
-	iPaymentUsecase := paymentUsecase.NewPayment(iPaymentRepository)
+	iPaymentUsecase := paymentUsecase.NewPayment(cfg, iPaymentRepository)
 	paymentGrpc := paymentHandler.NewPaymentGrpc(cfg, iPaymentUsecase)
 	paymentHttp := paymentHandler.NewPaymentHttp(cfg, iPaymentUsecase)
 	paymentQueue := paymentHandler.NewPaymentQueue(cfg, iPaymentUsecase)
