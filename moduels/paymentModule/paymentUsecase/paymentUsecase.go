@@ -2,6 +2,7 @@ package paymentUsecase
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 
@@ -11,6 +12,8 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
 	paymentRepository "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/queue"
 )
 
@@ -19,6 +22,10 @@ type (
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
 		FindItemInIds(pctx context.Context, req []*paymentModule.ItemServiceReqDatum) error
+		PaymentConsumer(pctx context.Context) (sarama.PartitionConsumer, error)
+		TradingItemConsumer(pctx context.Context, key string, resCh chan<- *paymentModule.PaymentTransferRes)
+		BuyItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) ([]*paymentModule.PaymentTransferRes, error)
+		SellItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) ([]*paymentModule.PaymentTransferRes, error)
 	}
 
 	paymentUsecase struct {
@@ -45,6 +52,7 @@ func (u *paymentUsecase) GetOffset(pctx context.Context) (int64, error) {
 func (u *paymentUsecase) UpsertOffset(pctx context.Context, offset int64) error {
 	err := u.paymentRepo.UpsertOffset(pctx, offset)
 	if err != nil {
+		logger.Error(err)
 		return err
 	}
 
@@ -54,24 +62,33 @@ func (u *paymentUsecase) UpsertOffset(pctx context.Context, offset int64) error 
 func (u *paymentUsecase) PaymentConsumer(pctx context.Context) (sarama.PartitionConsumer, error) {
 	worker, err := queue.ConnectConsumer([]string{u.cfg.Kafka.Url}, u.cfg.Kafka.ApiKey, u.cfg.Kafka.Secret)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	offset, err := u.paymentRepo.GetOffset(pctx)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
-	consumer, err := worker.ConsumePartition("payment", 0, offset)
+	consumer, err := worker.ConsumePartition("payment2222", 0, offset)
 	if err != nil {
 		slog.Warn("try to set offset as 0")
 		consumer, err = worker.ConsumePartition("payment", 0, 0)
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
 
+		logger.Error(err)
 		return nil, err
 	}
+
+	fmt.Println("consumer 001:")
+	fmt.Printf("%+v", <-consumer.Errors())
+	fmt.Printf("%+v", <-consumer.Messages())
+	fmt.Println("consumer 002:")
 
 	return consumer, nil
 }
@@ -82,14 +99,26 @@ func (u *paymentUsecase) TradingItemConsumer(pctx context.Context, key string, r
 		resCh <- nil
 		return
 	}
+	defer consumer.Close()
 
-	slog.Info("start BuyItemConsumer")
+	logger.Info("start BuyItemConsumer...")
+
+	fmt.Println("butter 1")
+	fmt.Printf("butter_debug: %+v", consumer)
+	fmt.Println("\n butter 1.1")
 
 	select {
 	case err := <-consumer.Errors():
+		fmt.Println("butter 2")
 		slog.Error("BuyItemConsumer Failed: ", err.Error())
+		resCh <- nil
+		return
 	case msg := <-consumer.Messages():
+		fmt.Println(string(msg.Key))
+		fmt.Println(key)
+		fmt.Println("butter 3")
 		if string(msg.Key) == key {
+			fmt.Println("butter 4")
 			u.UpsertOffset(pctx, msg.Offset+1)
 
 			req := new(paymentModule.PaymentTransferRes)
@@ -101,23 +130,72 @@ func (u *paymentUsecase) TradingItemConsumer(pctx context.Context, key string, r
 			resCh <- req
 			log.Printf("BuyItemConsumer | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
 		}
+		fmt.Println("butter 5")
 	}
+
+	fmt.Println("butter 6")
+	resCh <- nil
 }
 
-func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) error {
+func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) ([]*paymentModule.PaymentTransferRes, error) {
+	fmt.Println("hereeee 1")
 	if err := u.FindItemInIds(pctx, req.Items); err != nil {
-		return err
+		logger.Error(err)
+		return nil, err
 	}
 
-	return nil
+	fmt.Println("hereeee 2")
+	stage1 := make([]*paymentModule.PaymentTransferRes, 0, len(req.Items))
+	for _, item := range req.Items {
+		fmt.Println("hereeee 3")
+		if err := u.paymentRepo.DockedPlayerMoney(pctx, u.cfg, &playerModule.CreatePlayerTransactionReq{
+			PlayerId: playerId,
+			Amount:   item.Price,
+		}); err != nil {
+			logger.Error(err)
+			return nil, err
+		}
+
+		resCh := make(chan *paymentModule.PaymentTransferRes)
+
+		fmt.Println("hereeee 4")
+		go u.TradingItemConsumer(pctx, "buy", resCh)
+
+		fmt.Println("hereeee 5")
+		res := <-resCh
+		fmt.Println("hereeee 5.0")
+		if res != nil {
+			fmt.Println("hereeee 5.1")
+			stage1 = append(stage1, res)
+			fmt.Println("hereeee 5.2")
+		}
+
+		fmt.Println("hereeee 5.3")
+	}
+
+	fmt.Println("hereeee 6")
+	for _, s1 := range stage1 {
+		if s1.Error != "" {
+			for _, ss1 := range stage1 {
+				fmt.Println("hereeee 7")
+				u.paymentRepo.RollbackDockedPlayerMoney(pctx, u.cfg, &playerModule.RollbackPlayerTransactionReq{
+					TransactionId: ss1.TransactionId,
+				})
+			}
+		}
+	}
+
+	fmt.Println("hereeee 8")
+	return stage1, nil
 }
 
-func (u *paymentUsecase) SellItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) error {
+func (u *paymentUsecase) SellItem(pctx context.Context, playerId string, req *paymentModule.ItemServiceReq) ([]*paymentModule.PaymentTransferRes, error) {
 	if err := u.FindItemInIds(pctx, req.Items); err != nil {
-		return err
+		logger.Error(err)
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (u *paymentUsecase) FindItemInIds(pctx context.Context, req []*paymentModule.ItemServiceReqDatum) error {
@@ -135,6 +213,7 @@ func (u *paymentUsecase) FindItemInIds(pctx context.Context, req []*paymentModul
 		}(),
 	})
 	if err != nil {
+		logger.Error(err)
 		return err
 	}
 

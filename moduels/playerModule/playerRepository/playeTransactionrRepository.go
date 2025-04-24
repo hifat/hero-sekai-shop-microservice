@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/appError"
@@ -24,6 +25,8 @@ type (
 		GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error)
 		DeleteById(pctx context.Context, transactionId string) error
 		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 	}
 
 	playerTransactionRepository struct {
@@ -137,6 +140,40 @@ func (r *playerTransactionRepository) DeleteById(pctx context.Context, transacti
 	_, err := col.DeleteOne(pctx, bson.M{
 		"_id": utils.ConvertToObjectId(transactionId),
 	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *playerTransactionRepository) GetOffset(pctx context.Context) (int64, error) {
+	db := r.dbConn()
+	col := db.Collection("player_transactions_queue")
+
+	result := new(model.KafkaOffset)
+	if err := col.FindOne(pctx, bson.M{}).
+		Decode(result); err != nil {
+		return -1, err
+	}
+
+	return result.Offset, nil
+}
+
+func (r *playerTransactionRepository) UpsertOffset(pctx context.Context, offset int64) error {
+	db := r.dbConn()
+	col := db.Collection("player_transactions_queue")
+
+	_, err := col.UpdateOne(
+		pctx,
+		bson.M{},
+		bson.M{
+			"$set": bson.M{
+				"offset": offset,
+			},
+		},
+		options.Update().SetUpsert(true),
+	)
 	if err != nil {
 		return err
 	}

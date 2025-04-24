@@ -3,7 +3,6 @@ package grpccon
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
@@ -48,11 +47,11 @@ func (g *grpcAuth) unaryAuth(ctx context.Context, req any, info *grpc.UnaryServe
 		return nil, errors.New("x-api-key is empty value")
 	}
 
-	claim, err := jwtauth.ParseToken(g.secretKey, string(authHandler[0]))
+	_, err := jwtauth.ParseToken(g.secretKey, string(authHandler[0]))
 	if err != nil {
 		return nil, errors.New("token is invalid")
 	}
-	logger.Info(fmt.Sprintf("claims: %+v", claim))
+	// logger.Info(fmt.Sprintf("claims: %+v", claim))
 
 	return handler(ctx, req)
 }

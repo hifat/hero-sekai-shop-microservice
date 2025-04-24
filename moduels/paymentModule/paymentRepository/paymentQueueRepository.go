@@ -29,7 +29,7 @@ func (r *paymentRepository) DockedPlayerMoney(pctx context.Context, cfg *config.
 	return nil
 }
 
-func (r *paymentRepository) RollbackDockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error {
+func (r *paymentRepository) RollbackDockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.RollbackPlayerTransactionReq) error {
 	reqInBytes, err := json.Marshal(req)
 	if err != nil {
 		return err

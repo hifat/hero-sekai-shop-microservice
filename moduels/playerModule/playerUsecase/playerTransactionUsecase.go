@@ -15,8 +15,12 @@ import (
 
 type (
 	IPlayerTransactionUsecase interface {
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 		AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) (*playerModule.PlayerSavingAccount, error)
 		GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error)
+		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq)
+		RollbackPlayerTransaction(pctx context.Context, req *playerModule.RollbackPlayerTransactionReq)
 	}
 
 	playerTransactionUsecase struct {
@@ -26,6 +30,24 @@ type (
 
 func NewPlayerTransaction(playerTransactionRepo playerRepository.IPlayerTransactionRepository) IPlayerTransactionUsecase {
 	return &playerTransactionUsecase{playerTransactionRepo}
+}
+
+func (u *playerTransactionUsecase) GetOffset(pctx context.Context) (int64, error) {
+	offset, err := u.playerTransactionRepo.GetOffset(pctx)
+	if err != nil {
+		return -1, err
+	}
+
+	return offset, nil
+}
+func (u *playerTransactionUsecase) UpsertOffset(pctx context.Context, offset int64) error {
+	err := u.playerTransactionRepo.UpsertOffset(pctx, offset)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
 }
 
 func (u *playerTransactionUsecase) AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) (*playerModule.PlayerSavingAccount, error) {
@@ -108,7 +130,7 @@ func (u *playerTransactionUsecase) DockedPlayerMoneyRes(pctx context.Context, cf
 	})
 }
 
-func (u *playerTransactionUsecase) RollbackPlayerTransaction(pctx context.Context, req playerModule.RollbackPlayerTransactionReq) {
+func (u *playerTransactionUsecase) RollbackPlayerTransaction(pctx context.Context, req *playerModule.RollbackPlayerTransactionReq) {
 	if err := u.playerTransactionRepo.DeleteById(pctx, req.TransactionId); err != nil {
 		slog.Error(err.Error())
 	}

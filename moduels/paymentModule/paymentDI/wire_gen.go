@@ -12,6 +12,8 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentHandler"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule/paymentUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerRepository"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -22,15 +24,14 @@ func InitPayment(cfg *config.Config, db *mongo.Client) paymentHandler.Handler {
 	iPaymentUsecase := paymentUsecase.NewPayment(cfg, iPaymentRepository)
 	paymentGrpc := paymentHandler.NewPaymentGrpc(cfg, iPaymentUsecase)
 	paymentHttp := paymentHandler.NewPaymentHttp(cfg, iPaymentUsecase)
-	paymentQueue := paymentHandler.NewPaymentQueue(cfg, iPaymentUsecase)
-	handler := paymentHandler.NewHandler(paymentGrpc, paymentHttp, paymentQueue)
+	handler := paymentHandler.NewHandler(paymentGrpc, paymentHttp)
 	return handler
 }
 
 // wire.go:
 
-var RepoSet = wire.NewSet(paymentRepository.NewPayment)
+var RepoSet = wire.NewSet(paymentRepository.NewPayment, playerRepository.NewPlayer, playerRepository.NewPlayerTransaction)
 
-var UsecaseSet = wire.NewSet(paymentUsecase.NewPayment)
+var UsecaseSet = wire.NewSet(paymentUsecase.NewPayment, playerUsecase.NewPlayerTransaction)
 
-var HandlerSet = wire.NewSet(paymentHandler.NewHandler, paymentHandler.NewPaymentHttp, paymentHandler.NewPaymentGrpc, paymentHandler.NewPaymentQueue)
+var HandlerSet = wire.NewSet(paymentHandler.NewHandler, paymentHandler.NewPaymentHttp, paymentHandler.NewPaymentGrpc)

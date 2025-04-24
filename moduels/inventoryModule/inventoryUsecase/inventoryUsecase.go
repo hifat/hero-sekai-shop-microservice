@@ -68,6 +68,7 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, playerId string
 		}(),
 	})
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 

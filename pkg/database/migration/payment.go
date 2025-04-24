@@ -20,12 +20,12 @@ func PaymentMigrate(pctx context.Context, cfg *config.Config) {
 
 	/* ---------------------------------- Seeder --------------------------------- */
 
-	col := db.Collection("payments_queue")
+	col := db.Collection("payment_queue")
 
 	results, err := col.InsertOne(pctx, bson.M{"offset": -1})
 	if err != nil {
 		panic(err)
 	}
 
-	log.Printf("Migrate payments_queue complete: %+v", results)
+	log.Printf("Migrate payment_queue complete: %+v", results)
 }

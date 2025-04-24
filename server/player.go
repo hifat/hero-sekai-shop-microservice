@@ -12,6 +12,9 @@ import (
 func (s *server) playerService() {
 	playerHandler := playerDI.InitPlayer(s.cfg, s.db)
 
+	go playerHandler.PlayerQueue.DockedPlayerMoney()
+	go playerHandler.PlayerQueue.RollbackPlayerTransaction()
+
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.PlayerUrl)
 

@@ -1,13 +1,127 @@
 package playerHandler
 
-import "gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
+import (
+	"context"
+	"log"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/IBM/sarama"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/queue"
+)
 
 type (
 	playerQueue struct {
-		playerUsecase playerUsecase.IPlayerUsecase
+		cfg                      *config.Config
+		playerUsecase            playerUsecase.IPlayerUsecase
+		playerTransactionUsecase playerUsecase.IPlayerTransactionUsecase
 	}
 )
 
-func NewPlayerQueue(playerUsecase playerUsecase.IPlayerUsecase) *playerQueue {
-	return &playerQueue{playerUsecase}
+func NewPlayerQueue(cfg *config.Config, playerUsecase playerUsecase.IPlayerUsecase, playerTransactionUsecase playerUsecase.IPlayerTransactionUsecase) *playerQueue {
+	return &playerQueue{
+		cfg,
+		playerUsecase,
+		playerTransactionUsecase,
+	}
+}
+
+func (h *playerQueue) PlayerConsumer(pctx context.Context) (sarama.PartitionConsumer, error) {
+	worker, err := queue.ConnectConsumer([]string{h.cfg.Kafka.Url}, h.cfg.Kafka.ApiKey, h.cfg.Kafka.Secret)
+	if err != nil {
+		return nil, err
+	}
+
+	offset, err := h.playerTransactionUsecase.GetOffset(pctx)
+	if err != nil {
+		return nil, err
+	}
+
+	consumer, err := worker.ConsumePartition("payment", 0, offset)
+	if err != nil {
+		slog.Warn("try to set offset as 0")
+		consumer, err = worker.ConsumePartition("payment", 0, 0)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, err
+	}
+
+	return consumer, nil
+}
+
+func (h *playerQueue) DockedPlayerMoney() {
+	pctx := context.Background()
+
+	consumer, err := h.PlayerConsumer(pctx)
+	if err != nil {
+		return
+	}
+
+	slog.Info("start DockedPlayerMoney...")
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	for {
+		select {
+		case err := <-consumer.Errors():
+			slog.Error("DockedPlayerMoney Failed: ", err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "buy" {
+				h.playerTransactionUsecase.UpsertOffset(pctx, msg.Offset+1)
+
+				req := new(playerModule.CreatePlayerTransactionReq)
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					return
+				}
+
+				h.playerTransactionUsecase.DockedPlayerMoneyRes(pctx, h.cfg, req)
+
+				log.Printf("DockedPlayerMoney | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigChan:
+			slog.Info("Stop DockedPlayerMoney...")
+			return
+		}
+	}
+}
+
+func (h *playerQueue) RollbackPlayerTransaction() {
+	pctx := context.Background()
+
+	consumer, err := h.PlayerConsumer(pctx)
+	if err != nil {
+		return
+	}
+
+	slog.Info("start RollbackPlayerTransaction...")
+
+	for {
+		select {
+		case err := <-consumer.Errors():
+			slog.Error("RollbackPlayerTransaction Failed: ", err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "transaction" {
+				h.playerTransactionUsecase.UpsertOffset(pctx, msg.Offset+1)
+
+				req := new(playerModule.RollbackPlayerTransactionReq)
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					return
+				}
+
+				h.playerTransactionUsecase.RollbackPlayerTransaction(pctx, req)
+
+				log.Printf("RollbackPlayerTransaction | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		}
+	}
 }

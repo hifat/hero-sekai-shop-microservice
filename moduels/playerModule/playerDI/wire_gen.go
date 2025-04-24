@@ -25,7 +25,7 @@ func InitPlayer(cfg *config.Config, db *mongo.Client) playerHandler.Handler {
 	iPlayerTransactionUsecase := playerUsecase.NewPlayerTransaction(iPlayerTransactionRepository)
 	playerTransactionHttp := playerHandler.NewPlayerTransactionHttp(iPlayerTransactionUsecase)
 	playerGrpc := playerHandler.NewPlayerGrpc(iPlayerUsecase)
-	playerQueue := playerHandler.NewPlayerQueue(iPlayerUsecase)
+	playerQueue := playerHandler.NewPlayerQueue(cfg, iPlayerUsecase, iPlayerTransactionUsecase)
 	handler := playerHandler.NewHandler(playerHttp, playerTransactionHttp, playerGrpc, playerQueue)
 	return handler
 }

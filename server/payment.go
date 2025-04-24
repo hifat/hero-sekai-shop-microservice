@@ -7,8 +7,10 @@ import (
 func (s *server) paymentService() {
 	paymentGroup := s.app.Group("payment_v1")
 
-	paymentandler := paymentDI.InitPayment(s.cfg, s.db)
-	_ = paymentandler
+	paymentHandler := paymentDI.InitPayment(s.cfg, s.db)
 
 	paymentGroup.GET("", s.healthCheckService)
+
+	paymentGroup.POST("/buy", paymentHandler.PaymentHttp.BuyItem, s.middleware.MiddlewareHttp.JwtAuth)
+	paymentGroup.POST("/sell", paymentHandler.PaymentHttp.SellItem, s.middleware.MiddlewareHttp.JwtAuth)
 }
