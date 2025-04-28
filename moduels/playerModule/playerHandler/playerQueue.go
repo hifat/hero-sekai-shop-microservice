@@ -12,6 +12,7 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerUsecase"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/queue"
 )
 
@@ -42,15 +43,14 @@ func (h *playerQueue) PlayerConsumer(pctx context.Context) (sarama.PartitionCons
 		return nil, err
 	}
 
-	consumer, err := worker.ConsumePartition("payment", 0, offset)
+	consumer, err := worker.ConsumePartition("player", 0, offset)
 	if err != nil {
-		slog.Warn("try to set offset as 0")
-		consumer, err = worker.ConsumePartition("payment", 0, 0)
+		logger.Warn("Trying to set offset as 0")
+		consumer, err = worker.ConsumePartition("player", 0, 0)
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
-
-		return nil, err
 	}
 
 	return consumer, nil
@@ -61,6 +61,7 @@ func (h *playerQueue) DockedPlayerMoney() {
 
 	consumer, err := h.PlayerConsumer(pctx)
 	if err != nil {
+		logger.Error(err)
 		return
 	}
 
@@ -69,10 +70,11 @@ func (h *playerQueue) DockedPlayerMoney() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
+	// TODO: Handle consumer is nil
 	for {
 		select {
 		case err := <-consumer.Errors():
-			slog.Error("DockedPlayerMoney Failed: ", err.Error())
+			logger.Error("DockedPlayerMoney Failed: " + err.Error())
 			continue
 		case msg := <-consumer.Messages():
 			if string(msg.Key) == "buy" {
@@ -80,7 +82,8 @@ func (h *playerQueue) DockedPlayerMoney() {
 
 				req := new(playerModule.CreatePlayerTransactionReq)
 				if err := queue.DecodeMessage(req, msg.Value); err != nil {
-					return
+					logger.Error(err)
+					continue
 				}
 
 				h.playerTransactionUsecase.DockedPlayerMoneyRes(pctx, h.cfg, req)
@@ -88,7 +91,7 @@ func (h *playerQueue) DockedPlayerMoney() {
 				log.Printf("DockedPlayerMoney | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
 			}
 		case <-sigChan:
-			slog.Info("Stop DockedPlayerMoney...")
+			logger.Info("Stop DockedPlayerMoney...")
 			return
 		}
 	}
@@ -99,15 +102,16 @@ func (h *playerQueue) RollbackPlayerTransaction() {
 
 	consumer, err := h.PlayerConsumer(pctx)
 	if err != nil {
+		logger.Error(err)
 		return
 	}
 
-	slog.Info("start RollbackPlayerTransaction...")
+	logger.Info("start RollbackPlayerTransaction...")
 
 	for {
 		select {
 		case err := <-consumer.Errors():
-			slog.Error("RollbackPlayerTransaction Failed: ", err.Error())
+			logger.Error("RollbackPlayerTransaction Failed: " + err.Error())
 			continue
 		case msg := <-consumer.Messages():
 			if string(msg.Key) == "transaction" {
@@ -115,7 +119,7 @@ func (h *playerQueue) RollbackPlayerTransaction() {
 
 				req := new(playerModule.RollbackPlayerTransactionReq)
 				if err := queue.DecodeMessage(req, msg.Value); err != nil {
-					return
+					continue
 				}
 
 				h.playerTransactionUsecase.RollbackPlayerTransaction(pctx, req)

@@ -122,7 +122,7 @@ func PlayerMigrate(pctx context.Context, cfg *config.Config) {
 	playerTransactions := make([]any, 0)
 	for _, p := range results.InsertedIDs {
 		playerTransactions = append(playerTransactions, &playerModule.PlayerTransaction{
-			PlayerId:  "player:" + p.(primitive.ObjectID).Hex(),
+			PlayerId:  p.(primitive.ObjectID).Hex(),
 			Amount:    1000,
 			CreatedAt: utils.TimeNow(),
 			UpdatedAt: utils.TimeNow(),

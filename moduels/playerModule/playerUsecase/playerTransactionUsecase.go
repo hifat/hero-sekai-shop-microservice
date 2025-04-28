@@ -75,59 +75,43 @@ func (u *playerTransactionUsecase) GetSavingAccount(pctx context.Context, player
 
 func (u *playerTransactionUsecase) DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) {
 	savingAccount, err := u.playerTransactionRepo.GetSavingAccount(pctx, req.PlayerId)
-	if err != nil {
-		u.playerTransactionRepo.DockedPlayerMoneyRes(pctx, cfg, &paymentModule.PaymentTransferRes{
-			InventoryId:   "",
-			TransactionId: "",
-			PlayerId:      req.PlayerId,
-			ItemId:        "",
-			Amount:        req.Amount,
-			Error:         err.Error(),
-		})
-
-		return
-	}
-
-	if savingAccount.Balance < math.Abs(req.Amount) {
-		slog.Error("Err: DockedPlayerRes failed: not enough money")
-		u.playerTransactionRepo.DockedPlayerMoneyRes(pctx, cfg, &paymentModule.PaymentTransferRes{
-			InventoryId:   "",
-			TransactionId: "",
-			PlayerId:      req.PlayerId,
-			ItemId:        "",
-			Amount:        req.Amount,
-			Error:         "not enough money",
-		})
-
-		return
-	}
-
-	transactionId, err := u.playerTransactionRepo.Create(pctx, &playerModule.PlayerTransaction{
-		PlayerId:  req.PlayerId,
-		Amount:    req.Amount,
-		CreatedAt: utils.TimeNow(),
-	})
-	if err != nil {
-		u.playerTransactionRepo.DockedPlayerMoneyRes(pctx, cfg, &paymentModule.PaymentTransferRes{
-			InventoryId:   "",
-			TransactionId: "",
-			PlayerId:      req.PlayerId,
-			ItemId:        "",
-			Amount:        req.Amount,
-			Error:         err.Error(),
-		})
-
-		return
-	}
-
-	u.playerTransactionRepo.DockedPlayerMoneyRes(pctx, cfg, &paymentModule.PaymentTransferRes{
+	res := &paymentModule.PaymentTransferRes{
 		InventoryId:   "",
-		TransactionId: transactionId,
+		TransactionId: "",
 		PlayerId:      req.PlayerId,
 		ItemId:        "",
 		Amount:        req.Amount,
 		Error:         "",
-	})
+	}
+
+	isValidateFailed := false
+	if err != nil {
+		isValidateFailed = true
+		res.Error = err.Error()
+	}
+
+	if savingAccount.Balance < math.Abs(req.Amount) {
+		isValidateFailed = true
+		slog.Error("Err: DockedPlayerRes failed: not enough money")
+		res.Error = "not enough money"
+	}
+
+	if !isValidateFailed {
+		transactionId, err := u.playerTransactionRepo.Create(pctx, &playerModule.PlayerTransaction{
+			PlayerId:  req.PlayerId,
+			Amount:    req.Amount,
+			CreatedAt: utils.TimeNow(),
+		})
+		if err != nil {
+			res.Error = err.Error()
+		}
+
+		res.TransactionId = transactionId
+	}
+
+	if err := u.playerTransactionRepo.DockedPlayerMoneyRes(pctx, cfg, res); err != nil {
+		logger.Error(err)
+	}
 }
 
 func (u *playerTransactionUsecase) RollbackPlayerTransaction(pctx context.Context, req *playerModule.RollbackPlayerTransactionReq) {
