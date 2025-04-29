@@ -1,3 +1,5 @@
+name: hello-sekai-shop-db
+
 services:
    auth-db:
       image: mongo
