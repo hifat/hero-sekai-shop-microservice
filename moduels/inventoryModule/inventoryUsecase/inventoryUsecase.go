@@ -10,6 +10,7 @@ import (
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +19,13 @@ import (
 
 type (
 	IInventoryUsecase interface {
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 		FindPlayerItems(pctx context.Context, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error)
+		AddPlayerItemRes(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq)
+		RemovePlayerItemRes(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq)
+		RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq)
+		RollbackRemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq)
 	}
 
 	inventoryUsecase struct {
@@ -29,6 +36,25 @@ type (
 
 func NewInventory(cfg *config.Config, inventoryRepo inventoryRepository.IInventoryRepository) IInventoryUsecase {
 	return &inventoryUsecase{cfg, inventoryRepo}
+}
+
+func (u *inventoryUsecase) GetOffset(pctx context.Context) (int64, error) {
+	offset, err := u.inventoryRepo.GetOffset(pctx)
+	if err != nil {
+		return -1, err
+	}
+
+	return offset, nil
+}
+
+func (u *inventoryUsecase) UpsertOffset(pctx context.Context, offset int64) error {
+	err := u.inventoryRepo.UpsertOffset(pctx, offset)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
 }
 
 func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, playerId string, req *inventoryModule.InventorySearchReq) (*model.PaginateRes, error) {
@@ -140,4 +166,49 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, playerId string
 			Href:  fmt.Sprintf("%s/my-item?limit=%d&start=%s", u.cfg.Paginate.InventoryNextPageBasedUrl, req.Limit, start),
 		},
 	}, nil
+}
+
+func (u *inventoryUsecase) AddPlayerItemRes(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) {
+	res := &paymentModule.PaymentTransferRes{
+		InventoryId:   "",
+		TransactionId: "",
+		PlayerId:      req.PlayerId,
+		ItemId:        req.ItemId,
+		Amount:        0,
+		Error:         "",
+	}
+
+	inventoryId, err := u.inventoryRepo.CreatePlayerItem(pctx, &inventoryModule.Inventory{
+		PlayerId: req.PlayerId,
+		ItemId:   req.ItemId,
+	})
+	if err != nil {
+		res.Error = err.Error()
+	}
+
+	res.InventoryId = inventoryId
+
+	if err := u.inventoryRepo.AddPlayerItemRes(pctx, u.cfg, res); err != nil {
+		logger.Error(err)
+	}
+}
+
+func (u *inventoryUsecase) RemovePlayerItemRes(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) {
+
+}
+
+func (u *inventoryUsecase) RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) {
+	if err := u.inventoryRepo.DeletePlayerItem(pctx, req.InventoryId); err != nil {
+		logger.Error(err)
+	}
+}
+
+func (u *inventoryUsecase) RollbackRemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) {
+	_, err := u.inventoryRepo.CreatePlayerItem(pctx, &inventoryModule.Inventory{
+		PlayerId: req.PlayerId,
+		ItemId:   req.ItemId,
+	})
+	if err != nil {
+		logger.Error(err)
+	}
 }

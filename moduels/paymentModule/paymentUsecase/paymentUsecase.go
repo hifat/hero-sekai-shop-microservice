@@ -7,6 +7,7 @@ import (
 
 	"github.com/IBM/sarama"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
@@ -139,9 +140,15 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 
 		res := <-resCh
 		if res != nil {
-			stage1 = append(stage1, res)
+			stage1 = append(stage1, &paymentModule.PaymentTransferRes{
+				InventoryId:   res.InventoryId,
+				TransactionId: res.TransactionId,
+				PlayerId:      res.PlayerId,
+				ItemId:        res.ItemId,
+				Amount:        res.Amount,
+				Error:         res.Error,
+			})
 		}
-
 	}
 
 	for _, s1 := range stage1 {
@@ -150,6 +157,50 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 				logger.Error(s1.Error)
 				u.paymentRepo.RollbackDockedPlayerMoney(pctx, u.cfg, &playerModule.RollbackPlayerTransactionReq{
 					TransactionId: ss1.TransactionId,
+				})
+			}
+		}
+	}
+
+	stage2 := make([]*paymentModule.PaymentTransferRes, 0, len(stage1))
+	for _, s1 := range stage1 {
+		if err := u.paymentRepo.AddPlayerItem(pctx, u.cfg, &inventoryModule.UpdateInventoryReq{
+			PlayerId: playerId,
+			ItemId:   s1.ItemId,
+		}); err != nil {
+			logger.Error(err)
+			return nil, err
+		}
+
+		resCh := make(chan *paymentModule.PaymentTransferRes)
+
+		go u.TradingItemConsumer(pctx, "buy", resCh)
+
+		res := <-resCh
+		if res != nil {
+			stage2 = append(stage2, &paymentModule.PaymentTransferRes{
+				InventoryId:   res.InventoryId,
+				TransactionId: res.TransactionId,
+				PlayerId:      res.PlayerId,
+				ItemId:        res.ItemId,
+				Amount:        res.Amount,
+				Error:         res.Error,
+			})
+		}
+	}
+
+	for _, s2 := range stage2 {
+		if s2.Error != "" {
+			logger.Error(s2.Error)
+			for _, ss2 := range stage2 {
+				u.paymentRepo.RollbackAddPlayerItem(pctx, u.cfg, &inventoryModule.RollbackPlayerInventoryReq{
+					InventoryId: ss2.TransactionId,
+				})
+			}
+
+			for _, ss2 := range stage2 {
+				u.paymentRepo.RollbackDockedPlayerMoney(pctx, u.cfg, &playerModule.RollbackPlayerTransactionReq{
+					TransactionId: ss2.TransactionId,
 				})
 			}
 		}

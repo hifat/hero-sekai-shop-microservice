@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/queue"
 )
@@ -41,6 +42,46 @@ func (r *paymentRepository) RollbackDockedPlayerMoney(pctx context.Context, cfg 
 		cfg.Kafka.Secret,
 		"player",
 		"rtransaction",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) AddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"inventory",
+		"buy",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"inventory",
+		"radd",
 		reqInBytes,
 	); err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
@@ -21,6 +22,8 @@ type (
 		FindItemInIds(pctx context.Context, grpcUrl string, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error)
 		DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error
 		RollbackDockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.RollbackPlayerTransactionReq) error
+		AddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error
+		RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error
 	}
 
 	paymentRepository struct {

@@ -3,9 +3,11 @@ package inventoryRepository
 import (
 	"context"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/itemModule/itemProto"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/model"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/paymentModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/grpccon"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/logger"
@@ -18,9 +20,15 @@ import (
 
 type (
 	IInventoryRepository interface {
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 		FindItemInIds(pctx context.Context, grpcUrl string, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error)
 		FindPlayerItems(pctx context.Context, filter primitive.D, opts []*options.FindOptions) ([]*inventoryModule.Inventory, error)
 		CountByPlayerId(pctx context.Context, playerId string) (int64, error)
+		AddPlayerItemRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
+		RemovePlayerItemRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
+		CreatePlayerItem(pctx context.Context, req *inventoryModule.Inventory) (string, error)
+		DeletePlayerItem(pctx context.Context, inventoryId string) error
 	}
 
 	inventoryRepository struct {
@@ -38,7 +46,7 @@ func (r *inventoryRepository) dbConn() *mongo.Database {
 
 func (r *inventoryRepository) GetOffset(pctx context.Context) (int64, error) {
 	db := r.dbConn()
-	col := db.Collection("player_inventory_queue")
+	col := db.Collection("player_inventories_queue")
 
 	result := new(model.KafkaOffset)
 	if err := col.FindOne(pctx, bson.M{}).
@@ -51,7 +59,7 @@ func (r *inventoryRepository) GetOffset(pctx context.Context) (int64, error) {
 
 func (r *inventoryRepository) UpsertOffset(pctx context.Context, offset int64) error {
 	db := r.dbConn()
-	col := db.Collection("player_inventory_queue")
+	col := db.Collection("player_inventories_queue")
 
 	_, err := col.UpdateOne(
 		pctx,
@@ -116,4 +124,30 @@ func (r *inventoryRepository) CountByPlayerId(pctx context.Context, playerId str
 	return col.CountDocuments(pctx, bson.M{
 		"player_id": utils.ConvertToObjectId(playerId),
 	})
+}
+
+func (r *inventoryRepository) CreatePlayerItem(pctx context.Context, req *inventoryModule.Inventory) (string, error) {
+	db := r.dbConn()
+	col := db.Collection("player_inventories")
+
+	result, err := col.InsertOne(pctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+func (r *inventoryRepository) DeletePlayerItem(pctx context.Context, inventoryId string) error {
+	db := r.dbConn()
+	col := db.Collection("player_inventories")
+
+	_, err := col.DeleteOne(pctx, bson.M{
+		"_id": utils.ConvertToObjectId(inventoryId),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

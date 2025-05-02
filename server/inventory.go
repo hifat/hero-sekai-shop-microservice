@@ -7,6 +7,9 @@ import (
 func (s *server) inventoryService() {
 	inventoryHandler := inventoryDI.InitInventory(s.cfg, s.db)
 
+	go inventoryHandler.InventoryQueue.AddPlayerItem()
+	go inventoryHandler.InventoryQueue.RollbackAddPlayerItem()
+
 	inventoryGroup := s.app.Group("inventory_v1")
 
 	inventoryGroup.GET("", s.healthCheckService)

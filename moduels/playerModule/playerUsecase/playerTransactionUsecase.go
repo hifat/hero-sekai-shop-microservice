@@ -40,6 +40,7 @@ func (u *playerTransactionUsecase) GetOffset(pctx context.Context) (int64, error
 
 	return offset, nil
 }
+
 func (u *playerTransactionUsecase) UpsertOffset(pctx context.Context, offset int64) error {
 	err := u.playerTransactionRepo.UpsertOffset(pctx, offset)
 	if err != nil {
