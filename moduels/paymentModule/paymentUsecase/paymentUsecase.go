@@ -2,6 +2,7 @@ package paymentUsecase
 
 import (
 	"context"
+	"errors"
 	"log"
 	"log/slog"
 
@@ -141,11 +142,11 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 		res := <-resCh
 		if res != nil {
 			stage1 = append(stage1, &paymentModule.PaymentTransferRes{
-				InventoryId:   res.InventoryId,
+				InventoryId:   "",
 				TransactionId: res.TransactionId,
-				PlayerId:      res.PlayerId,
-				ItemId:        res.ItemId,
-				Amount:        res.Amount,
+				PlayerId:      playerId,
+				ItemId:        item.ItemId,
+				Amount:        item.Price,
 				Error:         res.Error,
 			})
 		}
@@ -159,6 +160,8 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 					TransactionId: ss1.TransactionId,
 				})
 			}
+
+			return nil, errors.New("error: buy item failed")
 		}
 	}
 
@@ -180,11 +183,11 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 		if res != nil {
 			stage2 = append(stage2, &paymentModule.PaymentTransferRes{
 				InventoryId:   res.InventoryId,
-				TransactionId: res.TransactionId,
-				PlayerId:      res.PlayerId,
-				ItemId:        res.ItemId,
-				Amount:        res.Amount,
-				Error:         res.Error,
+				TransactionId: s1.TransactionId,
+				PlayerId:      playerId,
+				ItemId:        s1.ItemId,
+				Amount:        s1.Amount,
+				Error:         s1.Error,
 			})
 		}
 	}
@@ -203,6 +206,8 @@ func (u *paymentUsecase) BuyItem(pctx context.Context, playerId string, req *pay
 					TransactionId: ss2.TransactionId,
 				})
 			}
+
+			return nil, errors.New("error: buy item failed")
 		}
 	}
 

@@ -130,7 +130,10 @@ func (r *inventoryRepository) CreatePlayerItem(pctx context.Context, req *invent
 	db := r.dbConn()
 	col := db.Collection("player_inventories")
 
-	result, err := col.InsertOne(pctx, req)
+	result, err := col.InsertOne(pctx, bson.M{
+		"player_id": utils.ConvertToObjectId(req.PlayerId),
+		"item_id":   utils.ConvertToObjectId(req.ItemId),
+	})
 	if err != nil {
 		return "", err
 	}
