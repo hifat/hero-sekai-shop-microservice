@@ -129,3 +129,23 @@ func (r *paymentRepository) RollbackRemovePlayerItem(pctx context.Context, cfg *
 
 	return nil
 }
+
+func (r *paymentRepository) AddPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"player",
+		"sell",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}

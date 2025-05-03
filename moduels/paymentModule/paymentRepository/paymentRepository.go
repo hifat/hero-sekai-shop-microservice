@@ -28,6 +28,7 @@ type (
 		RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error
 		RemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error
 		RollbackRemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error
+		AddPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error
 	}
 
 	paymentRepository struct {

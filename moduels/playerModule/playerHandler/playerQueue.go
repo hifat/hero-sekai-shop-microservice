@@ -129,3 +129,44 @@ func (h *playerQueue) RollbackPlayerTransaction() {
 		}
 	}
 }
+
+func (h *playerQueue) AddPlayerMoney() {
+	pctx := context.Background()
+
+	consumer, err := h.PlayerConsumer(pctx)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	slog.Info("start AddPlayerMoney...")
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// TODO: Handle consumer is nil
+	for {
+		select {
+		case err := <-consumer.Errors():
+			logger.Error("AddPlayerMoney Failed: " + err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "sell" {
+				h.playerTransactionUsecase.UpsertOffset(pctx, msg.Offset+1)
+
+				req := new(playerModule.CreatePlayerTransactionReq)
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					logger.Error(err)
+					continue
+				}
+
+				h.playerTransactionUsecase.AddPlayerMoneyRes(pctx, h.cfg, req)
+
+				log.Printf("AddPlayerMoney | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigChan:
+			logger.Info("Stop AddPlayerMoney...")
+			return
+		}
+	}
+}

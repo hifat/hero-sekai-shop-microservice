@@ -14,6 +14,7 @@ func (s *server) playerService() {
 
 	go playerHandler.PlayerQueue.DockedPlayerMoney()
 	go playerHandler.PlayerQueue.RollbackPlayerTransaction()
+	go playerHandler.PlayerQueue.AddPlayerMoney()
 
 	go func() {
 		grpcServer, lis := grpccon.NewGrpcServer(&s.cfg.Jwt, s.cfg.Grpc.PlayerUrl)

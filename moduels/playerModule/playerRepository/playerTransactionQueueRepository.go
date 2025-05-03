@@ -28,3 +28,23 @@ func (r *playerTransactionRepository) DockedPlayerMoneyRes(pctx context.Context,
 
 	return nil
 }
+
+func (r *playerTransactionRepository) AddPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"payment",
+		"sell",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}

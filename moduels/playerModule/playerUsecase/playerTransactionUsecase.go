@@ -19,8 +19,11 @@ type (
 		UpsertOffset(pctx context.Context, offset int64) error
 		AddMoney(pctx context.Context, req playerModule.CreatePlayerTransactionReq) (*playerModule.PlayerSavingAccount, error)
 		GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error)
+
+		// Queue
 		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq)
 		RollbackPlayerTransaction(pctx context.Context, req *playerModule.RollbackPlayerTransactionReq)
+		AddPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq)
 	}
 
 	playerTransactionUsecase struct {
@@ -118,5 +121,46 @@ func (u *playerTransactionUsecase) DockedPlayerMoneyRes(pctx context.Context, cf
 func (u *playerTransactionUsecase) RollbackPlayerTransaction(pctx context.Context, req *playerModule.RollbackPlayerTransactionReq) {
 	if err := u.playerTransactionRepo.DeleteById(pctx, req.TransactionId); err != nil {
 		slog.Error(err.Error())
+	}
+}
+
+func (u *playerTransactionUsecase) AddPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) {
+	savingAccount, err := u.playerTransactionRepo.GetSavingAccount(pctx, req.PlayerId)
+	res := &paymentModule.PaymentTransferRes{
+		InventoryId:   "",
+		TransactionId: "",
+		PlayerId:      req.PlayerId,
+		ItemId:        "",
+		Amount:        req.Amount,
+		Error:         "",
+	}
+
+	isValidateFailed := false
+	if err != nil {
+		isValidateFailed = true
+		res.Error = err.Error()
+	}
+
+	if savingAccount.Balance < math.Abs(req.Amount) {
+		isValidateFailed = true
+		slog.Error("Err: AddPlayerRes failed: not enough money")
+		res.Error = "not enough money"
+	}
+
+	if !isValidateFailed {
+		transactionId, err := u.playerTransactionRepo.Create(pctx, &playerModule.PlayerTransaction{
+			PlayerId:  req.PlayerId,
+			Amount:    req.Amount,
+			CreatedAt: utils.TimeNow(),
+		})
+		if err != nil {
+			res.Error = err.Error()
+		}
+
+		res.TransactionId = transactionId
+	}
+
+	if err := u.playerTransactionRepo.AddPlayerMoneyRes(pctx, cfg, res); err != nil {
+		logger.Error(err)
 	}
 }

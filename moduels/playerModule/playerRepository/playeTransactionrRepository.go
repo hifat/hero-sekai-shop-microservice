@@ -24,9 +24,12 @@ type (
 		Create(pctx context.Context, req *playerModule.PlayerTransaction) (string, error)
 		GetSavingAccount(pctx context.Context, playerId string) (*playerModule.PlayerSavingAccount, error)
 		DeleteById(pctx context.Context, transactionId string) error
-		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
+
+		// Queue
+		DockedPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
+		AddPlayerMoneyRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
 	}
 
 	playerTransactionRepository struct {
