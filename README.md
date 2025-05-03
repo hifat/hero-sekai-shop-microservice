@@ -73,3 +73,5 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic payment --from-
 ```sh
 kafka-console-producer --bootstrap-server localhost:9092 --topic payment
 ```
+
+## BUG

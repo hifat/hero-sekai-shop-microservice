@@ -2,6 +2,7 @@ package inventoryRepository
 
 import (
 	"context"
+	"errors"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/inventoryModule"
@@ -28,7 +29,9 @@ type (
 		AddPlayerItemRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
 		RemovePlayerItemRes(pctx context.Context, cfg *config.Config, req *paymentModule.PaymentTransferRes) error
 		CreatePlayerItem(pctx context.Context, req *inventoryModule.Inventory) (string, error)
-		DeletePlayerItem(pctx context.Context, inventoryId string) error
+		DeleteById(pctx context.Context, id string) error
+		IsExistedByPlayerItem(pctx context.Context, playerId string, itemId string) (bool, error)
+		DeletePlayerItem(pctx context.Context, playerId string, itemId string) error
 	}
 
 	inventoryRepository struct {
@@ -141,12 +144,46 @@ func (r *inventoryRepository) CreatePlayerItem(pctx context.Context, req *invent
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (r *inventoryRepository) DeletePlayerItem(pctx context.Context, inventoryId string) error {
+func (r *inventoryRepository) DeleteById(pctx context.Context, id string) error {
 	db := r.dbConn()
 	col := db.Collection("player_inventories")
 
 	_, err := col.DeleteOne(pctx, bson.M{
-		"_id": utils.ConvertToObjectId(inventoryId),
+		"_id": utils.ConvertToObjectId(id),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *inventoryRepository) IsExistedByPlayerItem(pctx context.Context, playerId string, itemId string) (bool, error) {
+	db := r.dbConn()
+	col := db.Collection("player_inventories")
+
+	result := new(inventoryModule.Inventory)
+	if err := col.FindOne(pctx, bson.M{
+		"player_id": utils.ConvertToObjectId(playerId),
+		"item_id":   utils.ConvertToObjectId(itemId),
+	}).Decode(result); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *inventoryRepository) DeletePlayerItem(pctx context.Context, playerId string, itemId string) error {
+	db := r.dbConn()
+	col := db.Collection("player_inventories")
+
+	_, err := col.DeleteOne(pctx, bson.M{
+		"player_id": utils.ConvertToObjectId(playerId),
+		"item_id":   utils.ConvertToObjectId(itemId),
 	})
 	if err != nil {
 		return err

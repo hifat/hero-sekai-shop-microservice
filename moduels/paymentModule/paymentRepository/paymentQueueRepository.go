@@ -89,3 +89,43 @@ func (r *paymentRepository) RollbackAddPlayerItem(pctx context.Context, cfg *con
 
 	return nil
 }
+
+func (r *paymentRepository) RemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"inventory",
+		"sell",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RollbackRemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"inventory",
+		"rremove",
+		reqInBytes,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -20,10 +20,14 @@ type (
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
 		FindItemInIds(pctx context.Context, grpcUrl string, req *itemProto.FindItemsInIdsReq) (*itemProto.FindItemsInIdsRes, error)
+
+		// Queue
 		DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.CreatePlayerTransactionReq) error
 		RollbackDockedPlayerMoney(pctx context.Context, cfg *config.Config, req *playerModule.RollbackPlayerTransactionReq) error
 		AddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error
 		RollbackAddPlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error
+		RemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.UpdateInventoryReq) error
+		RollbackRemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventoryModule.RollbackPlayerInventoryReq) error
 	}
 
 	paymentRepository struct {

@@ -9,6 +9,8 @@ func (s *server) inventoryService() {
 
 	go inventoryHandler.InventoryQueue.AddPlayerItem()
 	go inventoryHandler.InventoryQueue.RollbackAddPlayerItem()
+	go inventoryHandler.InventoryQueue.RemovePlayerItem()
+	go inventoryHandler.InventoryQueue.RollbackRemovePlayerItem()
 
 	inventoryGroup := s.app.Group("inventory_v1")
 

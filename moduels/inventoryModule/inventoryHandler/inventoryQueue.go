@@ -127,16 +127,90 @@ func (h *inventoryQueue) RollbackAddPlayerItem() {
 				log.Printf("RollbackAddPlayerItem | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
 			}
 		case <-sigChan:
-			logger.Info("Stop AddPlayerItem...")
+			logger.Info("Stop RollbackAddPlayerItem...")
 			return
 		}
 	}
 }
 
-func (h *inventoryQueue) RemovePlayerItemRes() {
+func (h *inventoryQueue) RemovePlayerItem() {
+	pctx := context.Background()
 
+	consumer, err := h.inventoryConsumer(pctx)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	slog.Info("start RemovePlayerItem...")
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// TODO: Handle consumer is nil
+	for {
+		select {
+		case err := <-consumer.Errors():
+			logger.Error("RemovePlayerItem Failed: " + err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "sell" {
+				h.inventoryUsecase.UpsertOffset(pctx, msg.Offset+1)
+
+				req := new(inventoryModule.UpdateInventoryReq)
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					logger.Error(err)
+					continue
+				}
+
+				h.inventoryUsecase.RemovePlayerItemRes(pctx, h.cfg, req)
+
+				log.Printf("RemovePlayerItem | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigChan:
+			logger.Info("Stop RemovePlayerItem...")
+			return
+		}
+	}
 }
 
 func (h *inventoryQueue) RollbackRemovePlayerItem() {
+	pctx := context.Background()
 
+	consumer, err := h.inventoryConsumer(pctx)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	slog.Info("start RollbackRemovePlayerItem...")
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// TODO: Handle consumer is nil
+	for {
+		select {
+		case err := <-consumer.Errors():
+			logger.Error("RollbackRemovePlayerItem Failed: " + err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "rremove" {
+				h.inventoryUsecase.UpsertOffset(pctx, msg.Offset+1)
+
+				req := new(inventoryModule.RollbackPlayerInventoryReq)
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					logger.Error(err)
+					continue
+				}
+
+				h.inventoryUsecase.RollbackRemovePlayerItem(pctx, h.cfg, req)
+
+				log.Printf("RollbackRemovePlayerItem | topic(%s) | Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigChan:
+			logger.Info("Stop RollbackRemovePlayerItem...")
+			return
+		}
+	}
 }
