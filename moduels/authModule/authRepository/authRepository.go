@@ -3,8 +3,10 @@ package authRepository
 import (
 	"context"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,6 +23,8 @@ type (
 		DeleteByCredentialId(pctx context.Context, credentialId string) (int64, error)
 		FindByAccessToken(pctx context.Context, accessToken string) (*authModule.Credential, error)
 		RoleCount(pctx context.Context) (int64, error)
+		NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory
+		NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory
 	}
 
 	authRepository struct {
@@ -129,4 +133,19 @@ func (r *authRepository) RoleCount(pctx context.Context) (int64, error) {
 	}
 
 	return count, nil
+}
+
+func (r *authRepository) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+	return jwtauth.NewAccessToken(cfg.RefreshSecretKey, cfg.AccessDuration, &jwtauth.Claims{
+		PlayerId: profile.Id,
+		RoleCode: profile.RoleCode,
+	})
+
+}
+
+func (r *authRepository) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+	return jwtauth.NewRefreshToken(cfg.RefreshSecretKey, cfg.RefreshDuration, &jwtauth.Claims{
+		PlayerId: profile.Id,
+		RoleCode: profile.RoleCode,
+	})
 }

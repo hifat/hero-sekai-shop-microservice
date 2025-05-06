@@ -47,15 +47,8 @@ func (u *authUsecase) Login(pctx context.Context, req *authModule.PlayerLoginReq
 		return nil, err
 	}
 
-	accessToken := jwtauth.NewAccessToken(u.cfg.Jwt.RefreshSecretKey, u.cfg.Jwt.AccessDuration, &jwtauth.Claims{
-		PlayerId: profile.Id,
-		RoleCode: profile.RoleCode,
-	})
-
-	refreshToken := jwtauth.NewRefreshToken(u.cfg.Jwt.RefreshSecretKey, u.cfg.Jwt.RefreshDuration, &jwtauth.Claims{
-		PlayerId: profile.Id,
-		RoleCode: profile.RoleCode,
-	})
+	accessToken := u.authRepo.NewAccessToken(u.cfg.Jwt, profile)
+	refreshToken := u.authRepo.NewRefreshToken(u.cfg.Jwt, profile)
 
 	credentialId, err := u.authRepo.InsertOne(pctx, &authModule.Credential{
 		PlayerId:     profile.Id,
@@ -112,20 +105,13 @@ func (u *authUsecase) RefreshToken(pctx context.Context, req *authModule.Refresh
 		return nil, err
 	}
 
-	accessToken := jwtauth.NewAccessToken(u.cfg.Jwt.RefreshSecretKey, u.cfg.Jwt.AccessDuration, &jwtauth.Claims{
-		PlayerId: profile.Id,
-		RoleCode: profile.RoleCode,
-	})
-
-	refreshToken := jwtauth.ReloadToken(u.cfg.Jwt.RefreshSecretKey, time.Duration(claims.ExpiresAt.Unix()), &jwtauth.Claims{
-		PlayerId: profile.Id,
-		RoleCode: profile.RoleCode,
-	})
+	accessToken := u.authRepo.NewAccessToken(u.cfg.Jwt, profile)
+	refreshToken := u.authRepo.NewRefreshToken(u.cfg.Jwt, profile)
 
 	if err := u.authRepo.UpdateRefreshToken(pctx, req.CredentialId, &authModule.UpdateRefreshTokenReq{
 		PlayerId:     profile.Id,
 		AccessToken:  accessToken.SignToken(),
-		RefreshToken: refreshToken,
+		RefreshToken: refreshToken.SignToken(),
 		UpdatedAt:    time.Now(),
 	}); err != nil {
 		logger.Error(err)

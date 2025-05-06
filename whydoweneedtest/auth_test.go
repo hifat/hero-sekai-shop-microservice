@@ -2,12 +2,24 @@ package whydoweneedtest
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authUsecase"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
 )
+
+type testLogin struct {
+	ctx      context.Context
+	cfg      *config.Config
+	req      *authModule.PlayerLoginReq
+	expected *authModule.ProfileIntercepter
+	err      error
+	isErr    bool
+}
 
 func TestLogin(t *testing.T) {
 	cfg := NewTestConfig()
@@ -23,5 +35,6 @@ func TestLogin(t *testing.T) {
 	mock.On("CredentialSearch", ctx, grpcUrl, &playerProto.CredentialSearchReq{
 		Email:    "test@sekai.com",
 		Password: "123456",
-	}).Return(nil, nil)
+	}).Return(nil, errors.New("mock_error"))
+
 }

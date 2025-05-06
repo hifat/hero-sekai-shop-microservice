@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/stretchr/testify/mock"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule/playerProto"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/pkg/jwtauth"
 )
 
 type AuthRepositoryMock struct {
@@ -54,4 +56,14 @@ func (m *AuthRepositoryMock) FindByAccessToken(pctx context.Context, accessToken
 func (m *AuthRepositoryMock) RoleCount(pctx context.Context) (int64, error) {
 	args := m.Called(pctx)
 	return int64(args.Int(0)), args.Error(1)
+}
+
+func (m *AuthRepositoryMock) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+	args := m.Called(cfg, profile)
+	return args.Get(0).(jwtauth.AuthFactory)
+}
+
+func (m *AuthRepositoryMock) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+	args := m.Called(cfg, profile)
+	return args.Get(0).(jwtauth.AuthFactory)
 }
