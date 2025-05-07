@@ -58,12 +58,17 @@ func (m *AuthRepositoryMock) RoleCount(pctx context.Context) (int64, error) {
 	return int64(args.Int(0)), args.Error(1)
 }
 
-func (m *AuthRepositoryMock) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+func (m *AuthRepositoryMock) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string {
 	args := m.Called(cfg, profile)
-	return args.Get(0).(jwtauth.AuthFactory)
+	return args.String(0)
 }
 
-func (m *AuthRepositoryMock) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+func (m *AuthRepositoryMock) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string {
 	args := m.Called(cfg, profile)
-	return args.Get(0).(jwtauth.AuthFactory)
+	return args.String(0)
+}
+
+func (m *AuthRepositoryMock) ParseToken(secret string, tokenString string) (*jwtauth.AuthMapClaims, error) {
+	args := m.Called(secret, tokenString)
+	return args.Get(0).(*jwtauth.AuthMapClaims), args.Error(1)
 }

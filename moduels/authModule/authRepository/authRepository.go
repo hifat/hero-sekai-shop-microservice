@@ -23,8 +23,9 @@ type (
 		DeleteByCredentialId(pctx context.Context, credentialId string) (int64, error)
 		FindByAccessToken(pctx context.Context, accessToken string) (*authModule.Credential, error)
 		RoleCount(pctx context.Context) (int64, error)
-		NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory
-		NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory
+		NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string
+		NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string
+		ParseToken(secret string, tokenString string) (*jwtauth.AuthMapClaims, error)
 	}
 
 	authRepository struct {
@@ -135,17 +136,20 @@ func (r *authRepository) RoleCount(pctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func (r *authRepository) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+func (r *authRepository) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string {
 	return jwtauth.NewAccessToken(cfg.RefreshSecretKey, cfg.AccessDuration, &jwtauth.Claims{
 		PlayerId: profile.Id,
 		RoleCode: profile.RoleCode,
-	})
-
+	}).SignToken()
 }
 
-func (r *authRepository) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) jwtauth.AuthFactory {
+func (r *authRepository) NewRefreshToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string {
 	return jwtauth.NewRefreshToken(cfg.RefreshSecretKey, cfg.RefreshDuration, &jwtauth.Claims{
 		PlayerId: profile.Id,
 		RoleCode: profile.RoleCode,
-	})
+	}).SignToken()
+}
+
+func (r *authRepository) ParseToken(secret string, tokenString string) (*jwtauth.AuthMapClaims, error) {
+	return jwtauth.ParseToken(secret, tokenString)
 }

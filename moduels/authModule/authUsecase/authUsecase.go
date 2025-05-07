@@ -53,8 +53,8 @@ func (u *authUsecase) Login(pctx context.Context, req *authModule.PlayerLoginReq
 	credentialId, err := u.authRepo.InsertOne(pctx, &authModule.Credential{
 		PlayerId:     profile.Id,
 		RoleCode:     profile.RoleCode,
-		AccessToken:  accessToken.SignToken(),
-		RefreshToken: refreshToken.SignToken(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 	if err != nil {
 		logger.Error(err)
@@ -110,8 +110,8 @@ func (u *authUsecase) RefreshToken(pctx context.Context, req *authModule.Refresh
 
 	if err := u.authRepo.UpdateRefreshToken(pctx, req.CredentialId, &authModule.UpdateRefreshTokenReq{
 		PlayerId:     profile.Id,
-		AccessToken:  accessToken.SignToken(),
-		RefreshToken: refreshToken.SignToken(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 		UpdatedAt:    time.Now(),
 	}); err != nil {
 		logger.Error(err)
