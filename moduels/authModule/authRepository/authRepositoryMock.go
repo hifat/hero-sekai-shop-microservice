@@ -14,10 +14,6 @@ type AuthRepositoryMock struct {
 	mock.Mock
 }
 
-func NewAuthRepositoryMock() IAuthRepository {
-	return &AuthRepositoryMock{}
-}
-
 func (m *AuthRepositoryMock) CredentialSearch(pctx context.Context, grpcUrl string, req *playerProto.CredentialSearchReq) (*playerProto.PlayerProfile, error) {
 	args := m.Called(pctx, grpcUrl, req)
 	return args.Get(0).(*playerProto.PlayerProfile), args.Error(1)
