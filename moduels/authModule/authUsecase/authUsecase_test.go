@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
