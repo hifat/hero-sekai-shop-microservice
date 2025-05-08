@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/IBM/sarama v1.45.1
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/wire v0.6.0

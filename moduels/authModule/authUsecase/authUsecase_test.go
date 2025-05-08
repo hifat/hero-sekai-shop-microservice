@@ -3,12 +3,13 @@ package authUsecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/authModule/authRepository"
 	"gitnub.com/hifat/hero-sekai-shop-microservice/moduels/playerModule"
@@ -17,186 +18,242 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type testLogin struct {
-	ctx      context.Context
-	req      *authModule.PlayerLoginReq
-	expected *authModule.ProfileIntercepter
-	err      error
-	isErr    bool
+type AuthTestSuite struct {
+	suite.Suite
+	cfg      *config.Config
+	repoMock *authRepository.AuthRepositoryMock
+	usecase  IAuthUsecase
+	testData struct {
+		grpcURL     string
+		emails      map[string]string
+		credentials map[string]string
+		tokens      map[string]string
+		playerInfo  map[string]string
+	}
 }
 
-func TestLogin(t *testing.T) {
-	cfg := whydoweneedtest.NewTestConfig()
-	repoMock := new(authRepository.AuthRepositoryMock)
-	usecase := NewAuth(cfg, repoMock)
-	zeroTime := time.Time{}.String()
+func TestAuthSuite(t *testing.T) {
+	suite.Run(t, new(AuthTestSuite))
+}
 
-	ctx := context.Background()
-	grpcUrl := cfg.Grpc.PlayerUrl
+func (s *AuthTestSuite) SetupTest() {
+	s.cfg = whydoweneedtest.NewTestConfig()
+	s.repoMock = new(authRepository.AuthRepositoryMock)
+	s.usecase = NewAuth(s.cfg, s.repoMock)
 
-	successEmail := "success@sekai.com"
-	errEmail := "err@sekai.com"
-	errInsertEmail := "err_insert@sekai.com"
-	errFindByCredEmail := "err_find_by_cred_search@sekai.com"
-	username := "player001"
-	password := "123456"
-	mockToken := "xxx"
-	mockCredentialId := primitive.NewObjectID()
-	mockCredentialIdErr := primitive.NewObjectID()
-	mockPlayerId := primitive.NewObjectID().Hex()
-	mockPlayerIdErr := "player_id_err"
-	mockPlayerIdFindByCredErr := "player_id_find_by_cred_err"
+	// Initialize test data
+	s.testData = struct {
+		grpcURL     string
+		emails      map[string]string
+		credentials map[string]string
+		tokens      map[string]string
+		playerInfo  map[string]string
+	}{
+		grpcURL: s.cfg.Grpc.PlayerUrl,
+		emails: map[string]string{
+			"success":       gofakeit.Email(),
+			"error":         gofakeit.Email(),
+			"insertError":   gofakeit.Email(),
+			"findByCredErr": gofakeit.Email(),
+		},
+		credentials: map[string]string{
+			"valid":   primitive.NewObjectID().Hex(),
+			"invalid": primitive.NewObjectID().Hex(),
+		},
+		tokens: map[string]string{
+			"mock": gofakeit.UUID(),
+		},
+		playerInfo: map[string]string{
+			"username":        gofakeit.Username(),
+			"password":        gofakeit.Password(true, true, true, true, false, 10),
+			"validId":         primitive.NewObjectID().Hex(),
+			"invalidId":       "player_id_err",
+			"findByCredErrId": "player_id_find_by_cred_err",
+		},
+	}
+}
 
-	repoMock.On("CredentialSearch", mock.Anything, grpcUrl, &playerProto.CredentialSearchReq{
-		Email:    successEmail,
-		Password: password,
-	}).Return(&playerProto.PlayerProfile{
-		Id:        mockPlayerId,
-		Email:     successEmail,
-		Username:  username,
-		RoleCode:  0,
-		CreatedAt: zeroTime,
-		UpdatedAt: zeroTime,
-	}, nil)
+func (s *AuthTestSuite) TearDownTest() {
+	s.repoMock.AssertExpectations(s.T())
+}
 
-	repoMock.On("CredentialSearch", mock.Anything, grpcUrl, &playerProto.CredentialSearchReq{
-		Email:    errEmail,
-		Password: password,
-	}).Return(&playerProto.PlayerProfile{}, errors.New("mock_error"))
-
-	repoMock.On("NewAccessToken", cfg.Jwt, mock.AnythingOfType("*playerProto.PlayerProfile")).
-		Return(mockToken)
-
-	repoMock.On("NewRefreshToken", cfg.Jwt, mock.AnythingOfType("*playerProto.PlayerProfile")).
-		Return(mockToken)
-
-	repoMock.On("InsertOne", ctx, &authModule.Credential{
-		PlayerId:     mockPlayerId,
-		RoleCode:     0,
-		AccessToken:  mockToken,
-		RefreshToken: mockToken,
-	}).Return(mockCredentialId.Hex(), nil)
-
-	repoMock.On("CredentialSearch", mock.Anything, grpcUrl, &playerProto.CredentialSearchReq{
-		Email:    errInsertEmail,
-		Password: password,
-	}).Return(&playerProto.PlayerProfile{
-		Id:        mockPlayerIdErr,
-		Email:     errInsertEmail,
-		Username:  username,
-		RoleCode:  0,
-		CreatedAt: zeroTime,
-		UpdatedAt: zeroTime,
-	}, nil)
-
-	repoMock.On("InsertOne", ctx, &authModule.Credential{
-		PlayerId:     mockPlayerIdErr,
-		RoleCode:     0,
-		AccessToken:  mockToken,
-		RefreshToken: mockToken,
-	}).Return("", errors.New("mock_err"))
-
-	repoMock.On("FindByCredentialId", ctx, mockCredentialId.Hex()).
-		Return(&authModule.Credential{
-			Id:           mockCredentialId,
-			PlayerId:     mockPlayerId,
-			RoleCode:     0,
-			RefreshToken: mockToken,
-			AccessToken:  mockToken,
-			CreatedAt:    &time.Time{},
-			UpdatedAt:    &time.Time{},
-		}, nil)
-
-	/* ----------------------- FindByCredentialId err case ---------------------- */
-
-	repoMock.On("CredentialSearch", mock.Anything, grpcUrl, &playerProto.CredentialSearchReq{
-		Email:    errFindByCredEmail,
-		Password: password,
-	}).Return(&playerProto.PlayerProfile{
-		Id:        mockPlayerIdFindByCredErr,
-		Email:     successEmail,
-		Username:  username,
-		RoleCode:  0,
-		CreatedAt: zeroTime,
-		UpdatedAt: zeroTime,
-	}, nil)
-
-	repoMock.On("InsertOne", ctx, &authModule.Credential{
-		PlayerId:     mockPlayerIdFindByCredErr,
-		RoleCode:     0,
-		AccessToken:  mockToken,
-		RefreshToken: mockToken,
-	}).Return(mockCredentialIdErr.Hex(), nil)
-
-	repoMock.On("FindByCredentialId", ctx, mockCredentialIdErr.Hex()).
-		Return(&authModule.Credential{}, errors.New("mock_err"))
-
-	tests := []testLogin{
+func (s *AuthTestSuite) TestLogin() {
+	tests := []struct {
+		name     string
+		ctx      context.Context
+		req      *authModule.PlayerLoginReq
+		setup    func()
+		expected *authModule.ProfileIntercepter
+		wantErr  bool
+	}{
 		{
-			ctx: ctx,
+			name: "success - valid login credentials",
+			ctx:  context.Background(),
 			req: &authModule.PlayerLoginReq{
-				Email:    successEmail,
-				Password: password,
+				Email:    s.testData.emails["success"],
+				Password: s.testData.playerInfo["password"],
 			},
-			expected: &authModule.ProfileIntercepter{
-				PlayerProfile: &playerModule.PlayerProfile{
-					Id:        mockPlayerId,
-					Email:     successEmail,
-					Username:  username,
-					CreatedAt: &time.Time{},
-					UpdatedAt: &time.Time{},
-				},
-				Credential: &authModule.CredentialRes{
-					Id:           mockCredentialId.Hex(),
-					PlayerId:     mockPlayerId,
+			setup: func() {
+				s.setupSuccessfulLoginMocks()
+			},
+			expected: s.getExpectedSuccessProfile(),
+			wantErr:  false,
+		},
+		{
+			name: "error - invalid credentials",
+			ctx:  context.Background(),
+			req: &authModule.PlayerLoginReq{
+				Email:    s.testData.emails["error"],
+				Password: s.testData.playerInfo["password"],
+			},
+			setup: func() {
+				s.repoMock.On("CredentialSearch", mock.Anything, s.testData.grpcURL, &playerProto.CredentialSearchReq{
+					Email:    s.testData.emails["error"],
+					Password: s.testData.playerInfo["password"],
+				}).Return(&playerProto.PlayerProfile{}, errors.New("mock_error"))
+			},
+			expected: nil,
+			wantErr:  true,
+		},
+		{
+			name: "error - failed to insert credential",
+			ctx:  context.Background(),
+			req: &authModule.PlayerLoginReq{
+				Email:    s.testData.emails["insertError"],
+				Password: s.testData.playerInfo["password"],
+			},
+			setup: func() {
+				s.repoMock.On("CredentialSearch", mock.Anything, s.testData.grpcURL, &playerProto.CredentialSearchReq{
+					Email:    s.testData.emails["insertError"],
+					Password: s.testData.playerInfo["password"],
+				}).Return(&playerProto.PlayerProfile{
+					Id:        s.testData.playerInfo["invalidId"],
+					Email:     s.testData.emails["insertError"],
+					Username:  s.testData.playerInfo["username"],
+					RoleCode:  0,
+					CreatedAt: time.Time{}.String(),
+					UpdatedAt: time.Time{}.String(),
+				}, nil)
+
+				s.repoMock.On("InsertOne", context.Background(), &authModule.Credential{
+					PlayerId:     s.testData.playerInfo["invalidId"],
 					RoleCode:     0,
-					AccessToken:  mockToken,
-					RefreshToken: mockToken,
-					CreatedAt:    &time.Time{},
-					UpdatedAt:    &time.Time{},
-				},
-			},
-			isErr: false,
-		},
-		{
-			ctx: ctx,
-			req: &authModule.PlayerLoginReq{
-				Email:    errEmail,
-				Password: password,
+					AccessToken:  s.testData.tokens["mock"],
+					RefreshToken: s.testData.tokens["mock"],
+				}).Return("", errors.New("mock_err"))
 			},
 			expected: nil,
-			isErr:    true,
+			wantErr:  true,
 		},
 		{
-			ctx: ctx,
+			name: "error - failed to find credential by ID",
+			ctx:  context.Background(),
 			req: &authModule.PlayerLoginReq{
-				Email:    errInsertEmail,
-				Password: password,
+				Email:    s.testData.emails["findByCredErr"],
+				Password: s.testData.playerInfo["password"],
+			},
+			setup: func() {
+				s.repoMock.On("CredentialSearch", mock.Anything, s.testData.grpcURL, &playerProto.CredentialSearchReq{
+					Email:    s.testData.emails["findByCredErr"],
+					Password: s.testData.playerInfo["password"],
+				}).Return(&playerProto.PlayerProfile{
+					Id:        s.testData.playerInfo["findByCredErrId"],
+					Email:     s.testData.emails["findByCredErr"],
+					Username:  s.testData.playerInfo["username"],
+					RoleCode:  0,
+					CreatedAt: time.Time{}.String(),
+					UpdatedAt: time.Time{}.String(),
+				}, nil)
+
+				s.repoMock.On("InsertOne", context.Background(), &authModule.Credential{
+					PlayerId:     s.testData.playerInfo["findByCredErrId"],
+					RoleCode:     0,
+					AccessToken:  s.testData.tokens["mock"],
+					RefreshToken: s.testData.tokens["mock"],
+				}).Return(s.testData.credentials["invalid"], nil)
+
+				s.repoMock.On("FindByCredentialId", context.Background(), s.testData.credentials["invalid"]).
+					Return(&authModule.Credential{}, errors.New("mock_err"))
 			},
 			expected: nil,
-			isErr:    true,
-		},
-		{
-			ctx: ctx,
-			req: &authModule.PlayerLoginReq{
-				Email:    errFindByCredEmail,
-				Password: password,
-			},
-			expected: nil,
-			isErr:    true,
+			wantErr:  true,
 		},
 	}
 
-	for i, _test := range tests {
-		fmt.Printf("case -> %d\n", i+1)
+	for _, tt := range tests {
+		s.Run(tt.name, func() {
+			if tt.setup != nil {
+				tt.setup()
+			}
 
-		result, err := usecase.Login(_test.ctx, _test.req)
-		if _test.isErr {
-			assert.NotEmpty(t, err)
-			continue
-		}
+			result, err := s.usecase.Login(tt.ctx, tt.req)
+			if tt.wantErr {
+				s.Error(err)
+				s.Nil(result)
+				return
+			}
 
-		assert.NoError(t, err)
-		assert.Equal(t, _test.expected, result)
+			s.NoError(err)
+			s.Equal(tt.expected, result)
+		})
+	}
+}
+
+func (s *AuthTestSuite) setupSuccessfulLoginMocks() {
+	s.repoMock.On("CredentialSearch", mock.Anything, s.testData.grpcURL, &playerProto.CredentialSearchReq{
+		Email:    s.testData.emails["success"],
+		Password: s.testData.playerInfo["password"],
+	}).Return(&playerProto.PlayerProfile{
+		Id:        s.testData.playerInfo["validId"],
+		Email:     s.testData.emails["success"],
+		Username:  s.testData.playerInfo["username"],
+		RoleCode:  0,
+		CreatedAt: time.Time{}.String(),
+		UpdatedAt: time.Time{}.String(),
+	}, nil)
+
+	s.repoMock.On("NewAccessToken", s.cfg.Jwt, mock.AnythingOfType("*playerProto.PlayerProfile")).
+		Return(s.testData.tokens["mock"])
+
+	s.repoMock.On("NewRefreshToken", s.cfg.Jwt, mock.AnythingOfType("*playerProto.PlayerProfile")).
+		Return(s.testData.tokens["mock"])
+
+	s.repoMock.On("InsertOne", context.Background(), &authModule.Credential{
+		PlayerId:     s.testData.playerInfo["validId"],
+		RoleCode:     0,
+		AccessToken:  s.testData.tokens["mock"],
+		RefreshToken: s.testData.tokens["mock"],
+	}).Return(s.testData.credentials["valid"], nil)
+
+	s.repoMock.On("FindByCredentialId", context.Background(), s.testData.credentials["valid"]).
+		Return(&authModule.Credential{
+			Id:           primitive.NewObjectID(),
+			PlayerId:     s.testData.playerInfo["validId"],
+			RoleCode:     0,
+			RefreshToken: s.testData.tokens["mock"],
+			AccessToken:  s.testData.tokens["mock"],
+			CreatedAt:    &time.Time{},
+			UpdatedAt:    &time.Time{},
+		}, nil)
+}
+
+func (s *AuthTestSuite) getExpectedSuccessProfile() *authModule.ProfileIntercepter {
+	return &authModule.ProfileIntercepter{
+		PlayerProfile: &playerModule.PlayerProfile{
+			Id:        s.testData.playerInfo["validId"],
+			Email:     s.testData.emails["success"],
+			Username:  s.testData.playerInfo["username"],
+			CreatedAt: &time.Time{},
+			UpdatedAt: &time.Time{},
+		},
+		Credential: &authModule.CredentialRes{
+			Id:           s.testData.credentials["valid"],
+			PlayerId:     s.testData.playerInfo["validId"],
+			RoleCode:     0,
+			AccessToken:  s.testData.tokens["mock"],
+			RefreshToken: s.testData.tokens["mock"],
+			CreatedAt:    &time.Time{},
+			UpdatedAt:    &time.Time{},
+		},
 	}
 }
