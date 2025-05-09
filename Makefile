@@ -20,3 +20,9 @@ kafka-up:
 
 kafka-down:
 	docker compose -f docker-compose.kafka.yaml down
+
+d-build:
+	docker build -f ./build/Dockerfile -t hellosekai-shop:latest .
+
+d-push:
+	docker push $u/hello-sekai-shop-$s
