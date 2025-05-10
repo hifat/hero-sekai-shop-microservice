@@ -29,3 +29,9 @@ d-push:
 
 kube-apply:
 	kubectl apply -f ./build/$n/$n-service.yaml
+
+kube-create-configmap:
+	kubectl create configmap app-env --from-file=./env/prod/.env
+
+kube-create-delete:
+	kubectl delete configmap <NAME>

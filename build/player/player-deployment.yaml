@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: player-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: player
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: player
+    spec:
+      volumes:
+      - name: app-env
+        configMap:
+          name: app-env
+      containers:
+        - name: player
+          image: butternoei008/hello-sekai-shop:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+          - name: app-env
+            mountPath: /etc/env
+          env:
+          - name: APP_NAME
+            value: "player"
+          - name: DB_URL
+            value: "mongodb://root:123456@0.0.0.0:27017"
+          - name: GRPC_AUTH_URL
+            value: "10.98.245.236:3000"
+          - name: GRPC_ITEM_URL
+            value: 10.109.127.146:3000"
+          - name: GRPC_PLAYER_URL
+            value: "10.108.229.146:3000"
+          - name: GRPC_INVENTORY_URL
+            value: "10.109.226.205:3000"
+          - name: GRPC_PAYMENT_URL
+            value: "10.111.98.229:3000"
+          - name: PAGINATE_ITEM_NEXT_PAGE_BASED_URL
+            value: "http://0.0.0.0:8080/item_v1/item"
+          - name: PAGINATE_INVENTORY_NEXT_PAGE_BASED_URL
+            value: "http://0.0.0.0:8080/inventory_v1/inventory"
+

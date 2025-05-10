@@ -74,4 +74,14 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic payment --from-
 kafka-console-producer --bootstrap-server localhost:9092 --topic payment
 ```
 
+## K8S
+
+```sh
+kubectl create configmap <NAME> --from-file=<ENV_PATH>
+```
+
+```sh
+kubectl delete configmap <NAME>
+```
+
 ## BUG
