@@ -26,3 +26,6 @@ d-build:
 
 d-push:
 	docker push $u/hello-sekai-shop-$s
+
+kube-apply:
+	kubectl apply -f ./build/$n/$n-service.yaml
