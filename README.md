@@ -84,4 +84,36 @@ kubectl create configmap <NAME> --from-file=<ENV_PATH>
 kubectl delete configmap <NAME>
 ```
 
+```sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.2/deploy/static/provider/cloud/deploy.yaml
+```
+
+```sh
+kubectl get ingress
+```
+
+```sh
+kubectl get deployment 
+```
+
+```sh
+kubectl get pods 
+```
+
+```sh
+kubectl logs -f <POD_NAME>
+```
+
+```sh
+kubectl scale deployment/nginx-deployment --replicas=10
+```
+
+## Source
+
+
+[k8s service](https://kubernetes.io/docs/concepts/services-networking/service/)
+[k8s deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+[ingress nginx install guide](https://kubernetes.github.io/ingress-nginx/deploy/)
+[scaling a deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#scaling-a-deployment)
+
 ## BUG
