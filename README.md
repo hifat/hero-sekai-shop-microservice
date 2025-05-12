@@ -108,6 +108,10 @@ kubectl logs -f <POD_NAME>
 kubectl scale deployment/nginx-deployment --replicas=10
 ```
 
+```sh
+kubectl rollout restart deployment/<DEPLOYMENT_NAME>
+```
+
 ## Source
 
 

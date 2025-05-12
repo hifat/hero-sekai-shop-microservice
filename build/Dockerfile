@@ -11,4 +11,7 @@ FROM scratch
 COPY --from=builder ./hero-sekai-shop /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-ENTRYPOINT ["/hero-sekai-shop"]
+# For build in local
+# COPY /env/.env /env/prod/
+
+ENTRYPOINT ["/hero-sekai-shop", "/etc/env/.env"]

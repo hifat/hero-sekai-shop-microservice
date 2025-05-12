@@ -27,17 +27,17 @@ d-build:
 d-push:
 	docker push $u/hello-sekai-shop-$s
 
-kube-apply:
+kube-service:
 	kubectl apply -f ./build/$n/$n-service.yaml
 
 kube-deployment:
 	kubectl apply -f ./build/$n/$n-deployment.yaml
 
-kube-apply-ingress:
+kube-ingress:
 	kubectl apply -f ./build/hello-sekai-shop-ingress.yaml
 
 kube-create-configmap:
 	kubectl create configmap app-env --from-file=./env/prod/.env
 
-kube-create-delete:
-	kubectl delete configmap <NAME>
+kube-delete-configmap:
+	kubectl delete configmap $n
