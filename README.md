@@ -112,12 +112,55 @@ kubectl scale deployment/nginx-deployment --replicas=10
 kubectl rollout restart deployment/<DEPLOYMENT_NAME>
 ```
 
-## Source
+- Check Ingress state
 
+```sh
+kubectl get svc -n ingress-nginx
+```
+
+## Source
 
 [k8s service](https://kubernetes.io/docs/concepts/services-networking/service/)
 [k8s deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 [ingress nginx install guide](https://kubernetes.github.io/ingress-nginx/deploy/)
 [scaling a deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#scaling-a-deployment)
+
+
+## Problem&Solve
+
+### ingress is on pending state
+
+```md
+NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx-controller             LoadBalancer   10.107.102.222   <pending>     80:31363/TCP,443:30797/TCP   2d
+```
+
+1. Delete existing ingress-nginx deployment:
+
+```sh
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+kubectl delete namespace ingress-nginx
+```
+
+2. Install NGINX Ingress Controller specifically for Docker Desktop:
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.2/deploy/static/provider/cloud/deploy.yaml
+```
+
+3. Wait for the deployment to complete:
+
+```sh
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=120s
+```
+
+4. Verify the installation:
+
+```sh
+kubectl get svc -n ingress-nginx
+```
 
 ## BUG

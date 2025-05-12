@@ -41,9 +41,5 @@ spec:
               value: "player-service.default.svc.cluster.local:3000"
             - name: GRPC_INVENTORY_URL
               value: "inventory-service.default.svc.cluster.local:3000"
-            - name: GRPC_PAYMENT_URL
-              value: "payment-service.default.svc.cluster.local:3000"
-            - name: PAGINATE_ITEM_NEXT_PAGE_BASED_URL
-              value: "http://0.0.0.0:8080/item_v1/item"
-            - name: PAGINATE_INVENTORY_NEXT_PAGE_BASED_URL
-              value: "http://0.0.0.0:8080/inventory_v1/inventory"
+            - name: KAFKA_URL
+              value: "host.docker.internal:9092"

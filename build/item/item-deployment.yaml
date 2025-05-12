@@ -32,18 +32,14 @@ spec:
             - name: APP_NAME
               value: "item"
             - name: DB_URL
-              value: "mongodb://root:123456@0.0.0.0:27017"
+              value: "mongodb://root:123456@host.docker.internal:27017"
             - name: GRPC_AUTH_URL
-              value: "10.98.80.64:3000"
-            - name: GRPC_ITEM_URL
-              value: 10.102.236.62:3000"
+              value: "auth-service.default.svc.cluster.local:3000"
             - name: GRPC_PLAYER_URL
-              value: "10.99.130.179:3000"
+              value: "player-service.default.svc.cluster.local:3000"
             - name: GRPC_INVENTORY_URL
-              value: "10.103.55.131:3000"
+              value: "inventory-service.default.svc.cluster.local:3000"
             - name: GRPC_PAYMENT_URL
-              value: "10.100.90.148:3000"
-            - name: PAGINATE_ITEM_NEXT_PAGE_BASED_URL
-              value: "http://0.0.0.0:8080/item_v1/item"
-            - name: PAGINATE_INVENTORY_NEXT_PAGE_BASED_URL
-              value: "http://0.0.0.0:8080/inventory_v1/inventory"
+              value: "payment-service.default.svc.cluster.local:3000"
+            - name: KAFKA_URL
+              value: "host.docker.internal:9092"
