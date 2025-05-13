@@ -163,4 +163,28 @@ kubectl wait --namespace ingress-nginx \
 kubectl get svc -n ingress-nginx
 ```
 
+**That not work** 👆 😅
+
+**This work** 👇
+- You may have accidentally deleted the "kubernetes service" when using the `kubectl delete --all service` command.
+- You should Reset cluster in Docker Desktop
+
+### Debugging ContainerCreating Status
+
+```
+Error from server (BadRequest): container "auth" in pod "auth-deployment-86875759df-tzks4" is waiting to start: ContainerCreating
+```
+
+1. Check detailed pod description:
+
+```sh
+kubectl describe pod <POD_NAME>
+```
+
+2. Check if there are any issues with the image pull:
+
+```sh
+kubectl get events --sort-by='.lastTimestamp'
+```
+
 ## BUG

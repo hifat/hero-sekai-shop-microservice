@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"gitnub.com/hifat/hero-sekai-shop-microservice/config"
@@ -18,7 +17,6 @@ func DbConnect(pctx context.Context, cfg *config.Config) *mongo.Client {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Db.Url))
 	if err != nil {
-		fmt.Printf("\n MONGO_URL: %s \n", cfg.Db.Url)
 		logger.Fatal(err.Error())
 	}
 

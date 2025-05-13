@@ -137,7 +137,7 @@ func (r *authRepository) RoleCount(pctx context.Context) (int64, error) {
 }
 
 func (r *authRepository) NewAccessToken(cfg config.Jwt, profile *playerProto.PlayerProfile) string {
-	return jwtauth.NewAccessToken(cfg.RefreshSecretKey, cfg.AccessDuration, &jwtauth.Claims{
+	return jwtauth.NewAccessToken(cfg.AccessSecretKey, cfg.AccessDuration, &jwtauth.Claims{
 		PlayerId: profile.Id,
 		RoleCode: profile.RoleCode,
 	}).SignToken()

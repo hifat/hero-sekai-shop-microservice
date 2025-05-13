@@ -47,8 +47,8 @@ func PushMessageWithKeyToQueue(brokerUrls []string, apiKey, secret, topic, key s
 
 	msg := &sarama.ProducerMessage{
 		Topic: topic,
-		Value: sarama.StringEncoder(message),
 		Key:   sarama.StringEncoder(key),
+		Value: sarama.StringEncoder(message),
 	}
 
 	partition, offset, err := producer.SendMessage(msg)
