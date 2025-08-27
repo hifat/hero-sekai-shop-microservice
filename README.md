@@ -6,6 +6,10 @@
 docker exec -it kafka-1 bash
 ```
 
+```sh
+cd ./opt/bitnami/kafka/bin
+```
+
 - Create Topic
 
 ```sh
@@ -65,6 +69,8 @@ kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic inventory
 kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic payment
 kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic player
 ```
+
+- Send&Listening
 
 ```sh
 kafka-console-consumer --bootstrap-server localhost:9092 --topic payment --from-beginning

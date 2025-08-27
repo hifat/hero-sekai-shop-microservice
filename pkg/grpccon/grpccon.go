@@ -16,21 +16,15 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type (
-	GrpcClientFactoryHandler interface {
-		Auth() authProto.AuthGrpcServiceClient
-		Player() playerProto.PlayerGrpcServiceClient
-		Item() itemProto.ItemGrpcServiceClient
-	}
+type GrpcClientFactoryHandler interface {
+	Auth() authProto.AuthGrpcServiceClient
+	Player() playerProto.PlayerGrpcServiceClient
+	Item() itemProto.ItemGrpcServiceClient
+}
 
-	grpcClientFactory struct {
-		client *grpc.ClientConn
-	}
-
-	grpcAuth struct {
-		secretKey string
-	}
-)
+type grpcAuth struct {
+	secretKey string
+}
 
 func (g *grpcAuth) unaryAuth(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -56,16 +50,8 @@ func (g *grpcAuth) unaryAuth(ctx context.Context, req any, info *grpc.UnaryServe
 	return handler(ctx, req)
 }
 
-func (g *grpcClientFactory) Auth() authProto.AuthGrpcServiceClient {
-	return authProto.NewAuthGrpcServiceClient(g.client)
-}
-
-func (g *grpcClientFactory) Player() playerProto.PlayerGrpcServiceClient {
-	return playerProto.NewPlayerGrpcServiceClient(g.client)
-}
-
-func (g *grpcClientFactory) Item() itemProto.ItemGrpcServiceClient {
-	return itemProto.NewItemGrpcServiceClient(g.client)
+type grpcClientFactory struct {
+	client *grpc.ClientConn
 }
 
 func NewGrpcClient(host string) (GrpcClientFactoryHandler, error) {
@@ -82,6 +68,18 @@ func NewGrpcClient(host string) (GrpcClientFactoryHandler, error) {
 	return &grpcClientFactory{
 		client: clientConn,
 	}, nil
+}
+
+func (g *grpcClientFactory) Auth() authProto.AuthGrpcServiceClient {
+	return authProto.NewAuthGrpcServiceClient(g.client)
+}
+
+func (g *grpcClientFactory) Player() playerProto.PlayerGrpcServiceClient {
+	return playerProto.NewPlayerGrpcServiceClient(g.client)
+}
+
+func (g *grpcClientFactory) Item() itemProto.ItemGrpcServiceClient {
+	return itemProto.NewItemGrpcServiceClient(g.client)
 }
 
 func NewGrpcServer(cfg *config.Jwt, host string) (*grpc.Server, net.Listener) {

@@ -41,3 +41,15 @@ kube-create-configmap:
 
 kube-delete-configmap:
 	kubectl delete configmap $n
+
+# Run all services
+run-all:
+	go run server/auth.go ./env/$(e)/.env.$(a) & \
+	go run server/inventory.go ./env/$(e)/.env.$(a) & \
+	go run server/item.go ./env/$(e)/.env.$(a) & \
+	go run server/payment.go ./env/$(e)/.env.$(a) & \
+	go run server/player.go ./env/$(e)/.env.$(a)
+
+# Kill all running Go processes
+kill-all:
+	pkill -f "go run server/"
